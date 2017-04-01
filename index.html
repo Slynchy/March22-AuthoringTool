@@ -13,7 +13,14 @@
             width: 60%;
             height: 800px;
             border: 1px solid lightgray;
-			position: static;
+			position: fixed;
+        }
+
+        #textbox {
+			position: fixed;
+            right: 0;
+            width: 40%;
+            height: 800px;
         }
     </style>
 
@@ -24,10 +31,13 @@
 
 <body onload="draw();">
 <h2>Hierarchical Layout - Scale-Free-Network</h2>
-<input id="fileItem" type="file" onchange="HandleFiles()" multiple></input>
-<br>
+<input id="fileItem" type="file" onchange="HandleFiles()" multiple>
+<br><br>
 
 <div id="mynetwork"></div>
+
+<!--<input id="textbox" type="text" name="textbox" value="" readonly="readonly" />-->
+<textarea id="textbox" rows="10" cols="80" readonly="readonly"></textarea>
 
 <p id="selection"></p>
 </body>
