@@ -79,6 +79,78 @@ function FindLoadedAsset(name, myArray)
     return undefined;
 }
 
+function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos)
+{
+    //Compile line
+    switch (tempLine_c.linetype) {
+        case LINETYPE.DRAW_BACKGROUND:
+            tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
+            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.backgrounds) == undefined) {
+                result.backgrounds.push(
+                    {
+                        filename: CURRENT_LINE_SPLIT[1],
+                        positionsOfUse:
+                        {
+                            nodeid: (result.nodes.length),
+                            pos: linePos
+                        }
+                    }
+                );
+            }
+            break;
+        case LINETYPE.SET_ACTIVE_TRANSITION:
+            tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
+            break;
+        case LINETYPE.NEW_PAGE:
+            break;
+        case LINETYPE.PLAY_MUSIC:
+            tempLine_c.lineContents = (tempArray[linePos]);
+            tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
+            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.music) == undefined) {
+                result.music.push(
+                    {
+                        filename: CURRENT_LINE_SPLIT[1],
+                        positionsOfUse:
+                        {
+                            nodeid: (result.nodes.length),
+                            pos: linePos
+                        }
+                    }
+                );
+            }
+            break;
+        case LINETYPE.PLAY_STING:
+            tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
+            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.sfx) == undefined) {
+                result.sfx.push(
+                    {
+                        filename: CURRENT_LINE_SPLIT[1],
+                        positionsOfUse:
+                        {
+                            nodeid: (result.nodes.length),
+                            pos: linePos
+                        }
+                    }
+                );
+            }
+            break;
+        case LINETYPE.M22IF:
+            var paramlinetype = CheckLineType(CURRENT_LINE_SPLIT[3]);
+            result.nodes.push({ text: nodeInfo.currentNodeTxt, pos: linePos });
+            result.nodelinks.push({ from: nodeInfo.currentNode, to: ++nodeInfo.currentNode });
+            result.ifStatements.push({ checkpoint: CURRENT_LINE_SPLIT[4], pos: linePos, node: (nodeInfo.currentNode-1) });
+            nodeInfo.currentNodeTxt = "";
+            break;
+    }
+}
+
+function CompileNode(_scriptStr, _scriptStrPos, result)
+{
+    // this function compiles script lines until it reaches an IF statement or a checkpoint
+    
+    // returns the new script str pos
+}
+
 // returns object of node
 function CompileScript(_scriptStr)
 {
@@ -89,6 +161,7 @@ function CompileScript(_scriptStr)
 	result.music = [];
 	result.nodes = [];
 	result.nodelinks = [];
+	result.ifStatements = []; // { checkpoint to jump to, pos, node }
 	result.__scriptCompiled__ = [];
 	
 	// Split the string into array of lines
@@ -105,11 +178,9 @@ function CompileScript(_scriptStr)
 		}
 	}
 	
-	var currentNodeText = "";
-	var lastNodePos = 0;
-	var lookingForChkpnt = [];
-	var lookingForChkpnt_currNode = [];
-	for (var n = 0, len = tempArray.length; n < len; n++) 
+	var nodeInfo = { currentNodeTxt: "", currentNode: 0 };
+	var n = 0;
+	for (n, len = tempArray.length; n < len; n++) 
 	{
 	    var CURRENT_LINE_SPLIT = tempArray[n].split(" ");
 	    for (var i = 0; i < CURRENT_LINE_SPLIT.length; i++)
@@ -132,115 +203,38 @@ function CompileScript(_scriptStr)
 		else if (tempLine_c.linetype == LINETYPE.CHECKPOINT)
 		{
 		    tempLine_c.params_txt = tempArray[n].substring(2);
-		    result.checkpoints.push({ name: tempLine_c.lineContents, pos: n });
-		    if (lookingForChkpnt == tempLine_c.params_txt)
-		    {
-		        //foundcheckpoint
-		        result.nodelinks.push(
-                    {
-                        from: lookingForChkpnt_currNode,
-                        to: result.nodes.length
-                    }
-                )
-		        result.nodes.push(
-                    {
-                        pos: lastNodePos,
-                        text: currentNodeText
-                    }
-                );
-		        lastNodePos = n;
-		        currentNodeText = "";
-		        lookingForChkpnt = "";
-		    }
+		    result.checkpoints.push({ name: tempLine_c.params_txt, pos: n, node: (nodeInfo.currentNode+1) });
+		    result.nodes.push({ text: nodeInfo.currentNodeTxt, pos: n });
+		    result.nodelinks.push({ from: nodeInfo.currentNode, to: ++nodeInfo.currentNode });
+		    nodeInfo.currentNodeTxt = "";
 		}
 		else
 		{
-		    //Compile line
-		    switch (tempLine_c.linetype)
-		    {
-		        case LINETYPE.DRAW_BACKGROUND:
-		            tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
-		            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.backgrounds) == undefined)
-		            {
-		                result.backgrounds.push(
-                            {
-                                filename: CURRENT_LINE_SPLIT[1], 
-                                positionsOfUse: 
-                                { 
-                                    nodeid: (result.nodes.length),
-                                    pos: n
-                                }
-                            }
-                        );
-		            }
-		            break;
-		        case LINETYPE.SET_ACTIVE_TRANSITION:
-		            tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
-		            break;
-		        case LINETYPE.NEW_PAGE:
-		            break;
-		        case LINETYPE.PLAY_MUSIC:
-		            tempLine_c.lineContents = (tempArray[n]);
-		            tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
-		            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.music) == undefined) {
-		                result.music.push(
-                            {
-                                filename: CURRENT_LINE_SPLIT[1],
-                                positionsOfUse:
-                                {
-                                    nodeid: (result.nodes.length),
-                                    pos: n
-                                }
-                            }
-                        );
-		            }
-		            break;
-                case LINETYPE.PLAY_STING:
-                    tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
-                    if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.sfx) == undefined) {
-                        result.sfx.push(
-                            {
-                                filename: CURRENT_LINE_SPLIT[1],
-                                positionsOfUse:
-                                {
-                                    nodeid: (result.nodes.length),
-                                    pos: n
-                                }
-                            }
-                        );
-                    }
-                    break;
-		        case LINETYPE.M22IF:
-		            var paramlinetype = CheckLineType(CURRENT_LINE_SPLIT[3]);
-		            result.nodes.push(
-                        {
-                            pos: lastNodePos,
-                            text: currentNodeText
-                        }
-		            );
-		            result.nodelinks.push(
-                        {
-                            from: result.nodes.length-1,
-                            to: result.nodes.length
-                        }
-                    )
-		            lastNodePos = n;
-		            currentNodeText = "";
-		            lookingForChkpnt = CURRENT_LINE_SPLIT[4];
-		            lookingForChkpnt_currNode = result.nodes.length;
-		            break;
-		    }
+		    CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, n);
 		}
+		nodeInfo.currentNodeTxt += tempArray[n] + "\n\n";
 		result.__scriptCompiled__.push(tempLine_c);
-		if (tempLine_c.lineContents.length >= 2)
-		    currentNodeText += tempLine_c.lineContents + "\n\n";
 	}
-	result.nodes.push(
-        {
-            pos: lastNodePos,
-            text: currentNodeText
-        }
-    );
+	result.nodes.push({ text: nodeInfo.currentNodeTxt, pos: n });
+	result.nodelinks.push({ from: nodeInfo.currentNode, to: ++nodeInfo.currentNode });
+
+	for (var i = 0; i < result.ifStatements.length; i++) 
+	{
+	    var tempLink = {
+	        from: result.ifStatements[i].node,
+	        to: 0
+	    }
+	    for (var n = 0; n < result.checkpoints.length; n++) 
+	    {
+	        if(result.checkpoints[n].name == result.ifStatements[i].checkpoint)
+	        {
+	            tempLink.to = result.checkpoints[n].node;
+	            break;
+	        }
+	    }
+	    result.nodelinks.push(tempLink);
+	}
+
 	console.log(result);
 	return result;
 }
@@ -259,13 +253,13 @@ function HandleFiles()
 			
 		    scriptFiles.push(CompileScript(e.target.result));
 
-		    nodes.push(
-                {
-                    id: 0,
-                    label: String(0)
-                }
-            );
-		    for (var n = 1; n < scriptFiles[0].nodes.length; n++)
+		    //nodes.push(
+            //    {
+            //        id: 0,
+            //        label: String(0)
+            //    }
+            //);
+		    for (var n = 0; n < scriptFiles[0].nodes.length; n++)
 		    {
 		        nodes.push(
                     {
@@ -279,7 +273,8 @@ function HandleFiles()
 		        edges.push(
                     {
                         from: scriptFiles[0].nodelinks[n].from,
-                        to: scriptFiles[0].nodelinks[n].to
+                        to: scriptFiles[0].nodelinks[n].to,
+                        arrows: 'to'
                     }
                 );
 		    }
@@ -299,6 +294,7 @@ function destroy() {
 	}
 }
 
+var options;
 function draw() {
 	destroy();
 	
@@ -309,20 +305,24 @@ function draw() {
 
 	// create a network
 	var container = document.getElementById('mynetwork');
-	var options = {
-		layout: {
-			hierarchical: {
-				enabled: true,
-				sortMethod: "directed",
-				direction: "UD",
-				edgeMinimization: false,
-				blockShifting: false
-			}
-		},
-		physics: {
-			enabled: false
-		}
+	options = {
+	    layout: {
+	        hierarchical: {
+	            direction: "UD",
+	            sortMethod: "directed"
+	        }
+	    },
+	    interaction: {
+	        dragNodes: false
+	    },
+	    manipulation: {
+	        enabled: false
+	    },
+	    physics: {
+	        enabled: false
+	    }
 	};
+
 	network = new vis.Network(container, data, options);
 
 	// add event listeners

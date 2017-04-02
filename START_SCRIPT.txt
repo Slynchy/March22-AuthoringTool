@@ -1,0 +1,35 @@
+This is a test script.
+
+It's not much, but it's here. Enjoy.
+
+Upcoming is an if statement to produce node 2 and 3
+
+// this is a comment!
+
+m22IF test_decision _choice1 Goto node5
+
+	This is node 2. Yippee. We're here because of a false return
+
+	Let's make things more complex. 
+
+	Let's jump make a nested if statement.
+
+	m22IF test_decision _choice1 Goto node6
+	
+		Welcome to node 3. Also false.
+
+		m22IF test_decision _choice1 Goto node7
+		
+			Welcome to node 4. Also false.
+
+--node5
+
+This is node 5. Yay.
+
+--node6
+
+This is node 6. Woop.
+
+--node7
+
+This is node 7. Woop.
