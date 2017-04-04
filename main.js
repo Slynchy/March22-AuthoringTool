@@ -261,20 +261,32 @@ function HandleFiles()
             //);
 		    for (var n = 0; n < scriptFiles[0].nodes.length; n++)
 		    {
+		        for (var chkpnt = 0; chkpnt < scriptFiles[0].checkpoints.length; chkpnt++) {
+    
+		        }
 		        nodes.push(
                     {
 		                id: n,
-		                label: String(n)
+		                label: String(n),
+		                title: "lmao",
+                        level: n
                     }
                 );
 		    }
+		    var flipFlop = false;
 		    for (var n = 0; n < scriptFiles[0].nodelinks.length; n++)
 		    {
 		        edges.push(
                     {
                         from: scriptFiles[0].nodelinks[n].from,
                         to: scriptFiles[0].nodelinks[n].to,
-                        arrows: 'to'
+                        arrows: 'to',
+                        smooth: 
+                        {
+                            type: (
+                                scriptFiles[0].nodelinks[n].to == scriptFiles[0].nodelinks[n].from + 1 ? "continuous" : ((flipFlop = !flipFlop) ? "curvedCW" : "curvedCCW")
+                            )
+                        }
                     }
                 );
 		    }
@@ -309,14 +321,15 @@ function draw() {
 	    layout: {
 	        hierarchical: {
 	            direction: "UD",
-	            sortMethod: "directed"
+	            sortMethod: "directed",
+	            nodeSpacing: 300
 	        }
 	    },
 	    interaction: {
-	        dragNodes: false
+	        dragNodes: true
 	    },
 	    manipulation: {
-	        enabled: false
+	        enabled: true
 	    },
 	    physics: {
 	        enabled: false
