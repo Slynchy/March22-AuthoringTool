@@ -1,3 +1,5 @@
+// https://ace.c9.io/#nav=embedding
+// Use this for text editing?
 
 var nodes = null;
 var edges = null;
@@ -5,12 +7,40 @@ var network = null;
 var scriptFileInput = document.getElementById("fileItem");
 var scriptFiles = [];
 
-// scriptmusic/scriptBG/scriptSFX = { filename, positionsOfUse{ nodeid, pos } }
-// checkpoints = { name, pos }
-// links = { name, scriptfile_linked, pos }
-// nodelinks = { from, to }
-// nodes = { pos, text }
-// compiled_lines = { linetype, params, params_txt, lineContents, ID } 
+/* 
+	scriptmusic/scriptBG/scriptSFX = { 
+		filename, 
+		positionsOfUse { 
+			nodeid, 
+			pos 
+		} 
+	}
+	checkpoints = { 
+		name, 
+		pos 
+	}
+	links = { 
+		name, 
+		scriptfile_linked, 
+		pos 
+	}
+	nodelinks = { 
+		from, 
+		to 
+	}
+	nodes = { 
+		pos, 
+		text 
+	}
+	compiled_lines = { 
+		linetype, 
+		params, 
+		params_txt, 
+		lineContents, 
+		ID 
+	} 
+
+*/
 
 var LINETYPE = {
 	NARRATIVE : -1,
@@ -61,7 +91,7 @@ function CheckLineType(_keyword)
 {
     if (_keyword.length >= 3)
     {
-        if(_keyword[0] == "-" && _keyword[0] == "-")
+        if(_keyword[0] == "-" && _keyword[1] == "-") // we don't need to check for comments, since they're already removed
         {
             return LINETYPE.CHECKPOINT;
         }
@@ -87,7 +117,7 @@ function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos, 
     switch (tempLine_c.linetype) {
         case LINETYPE.DRAW_BACKGROUND:
             tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
-            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.backgrounds) == undefined) {
+            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.backgrounds) === undefined) {
                 result.backgrounds.push(
                     {
                         filename: CURRENT_LINE_SPLIT[1],
@@ -108,7 +138,7 @@ function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos, 
         case LINETYPE.PLAY_MUSIC:
             tempLine_c.lineContents = (tempArray[linePos]);
             tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
-            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.music) == undefined) {
+            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.music) === undefined) {
                 result.music.push(
                     {
                         filename: CURRENT_LINE_SPLIT[1],
@@ -123,7 +153,7 @@ function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos, 
             break;
         case LINETYPE.PLAY_STING:
             tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
-            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.sfx) == undefined) {
+            if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.sfx) === undefined) {
                 result.sfx.push(
                     {
                         filename: CURRENT_LINE_SPLIT[1],
