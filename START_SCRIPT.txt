@@ -21,6 +21,8 @@ m22IF test_decision _choice1 Goto node5
 		m22IF test_decision _choice1 Goto node7
 		
 			Welcome to node 4. Also false.
+			
+			LoadScript test_script_3
 
 --node5
 

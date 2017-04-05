@@ -1,0 +1,3 @@
+This is test script 3.
+
+This script is also a dead end.

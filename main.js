@@ -22,7 +22,8 @@ var LINETYPE = {
 	CHECKPOINT : 6,
 	COMMENT : 7,
 	SET_ACTIVE_TRANSITION: 8,
-    M22IF: 9
+    M22IF: 9,
+	LOAD_SCRIPT: 10
 }
 
 // from: http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
@@ -47,7 +48,8 @@ var FunctionNames = [
 	"--",
 	"//", // Nor this, but is set up to handle it
 	"SetActiveTransition",
-    "m22IF"
+    "m22IF",
+	"LoadScript"
 ];
 var FunctionHashes = [];
 for (var n = 0, len = FunctionNames.length; n < len; n++) 
@@ -79,7 +81,7 @@ function FindLoadedAsset(name, myArray)
     return undefined;
 }
 
-function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos)
+function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos, hashedName)
 {
     //Compile line
     switch (tempLine_c.linetype) {
@@ -137,9 +139,12 @@ function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos)
         case LINETYPE.M22IF:
             var paramlinetype = CheckLineType(CURRENT_LINE_SPLIT[3]);
             result.nodes.push({ text: nodeInfo.currentNodeTxt, pos: linePos });
-            result.nodelinks.push({ from: nodeInfo.currentNode, to: ++nodeInfo.currentNode });
+            result.nodelinks.push({ from: hashedName + nodeInfo.currentNode, to: hashedName + ++nodeInfo.currentNode });
             result.ifStatements.push({ checkpoint: CURRENT_LINE_SPLIT[4], pos: linePos, node: (nodeInfo.currentNode-1) });
             nodeInfo.currentNodeTxt = "";
+            break;
+        case LINETYPE.LOAD_SCRIPT:
+            // 
             break;
     }
 }
@@ -152,7 +157,7 @@ function CompileNode(_scriptStr, _scriptStrPos, result)
 }
 
 // returns object of node
-function CompileScript(_scriptStr)
+function CompileScript(hashedName, _scriptStr)
 {
 	var result = {};
 	result.checkpoints = [];
@@ -169,7 +174,6 @@ function CompileScript(_scriptStr)
 	for (var n = 0, len = tempArray.length; n < len; n++) 
 	{
 		tempArray[n] = tempArray[n].trim();
-		// If empty line, remove
 		if(tempArray[n].length <= 1 || (tempArray[n][0] == "/" && tempArray[n][1] == "/"))	
 		{
 			tempArray.splice(n, 1);
@@ -205,30 +209,30 @@ function CompileScript(_scriptStr)
 		    tempLine_c.params_txt = tempArray[n].substring(2);
 		    result.checkpoints.push({ name: tempLine_c.params_txt, pos: n, node: (nodeInfo.currentNode+1) });
 		    result.nodes.push({ text: nodeInfo.currentNodeTxt, pos: n });
-		    result.nodelinks.push({ from: nodeInfo.currentNode, to: ++nodeInfo.currentNode });
+		    result.nodelinks.push({ from: hashedName + nodeInfo.currentNode, to: hashedName + ++nodeInfo.currentNode });
 		    nodeInfo.currentNodeTxt = "";
 		}
 		else
 		{
-		    CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, n);
+		    CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, n, hashedName);
 		}
 		nodeInfo.currentNodeTxt += tempArray[n] + "\n\n";
 		result.__scriptCompiled__.push(tempLine_c);
 	}
 	result.nodes.push({ text: nodeInfo.currentNodeTxt, pos: n });
-	result.nodelinks.push({ from: nodeInfo.currentNode, to: ++nodeInfo.currentNode });
+	result.nodelinks.push({ from: hashedName + nodeInfo.currentNode, to: hashedName + ++nodeInfo.currentNode });
 
 	for (var i = 0; i < result.ifStatements.length; i++) 
 	{
 	    var tempLink = {
-	        from: result.ifStatements[i].node,
+	        from: hashedName + result.ifStatements[i].node,
 	        to: 0
 	    }
 	    for (var n = 0; n < result.checkpoints.length; n++) 
 	    {
 	        if(result.checkpoints[n].name == result.ifStatements[i].checkpoint)
 	        {
-	            tempLink.to = result.checkpoints[n].node;
+	            tempLink.to = hashedName + result.checkpoints[n].node;
 	            break;
 	        }
 	    }
@@ -239,64 +243,65 @@ function CompileScript(_scriptStr)
 	return result;
 }
 
+function ReadFileAsText(file)
+{
+	var reader = new FileReader();
+	var textFile = file;
+	var complete = false;
+	reader.onload = function(e) {
+		var hashedName = file.name.hashCode();
+		var temp = CompileScript(hashedName, e.target.result);
+		for (var n = 0; n < temp.nodes.length; n++)
+		{
+			for (var chkpnt = 0; chkpnt < temp.checkpoints.length; chkpnt++) {
+
+			}
+			nodes.push(
+				{
+					id: hashedName + n,
+					label: String(n),
+					title: file.name,
+					level: n,
+					SCRIPT_PTR: temp.nodes[n]
+				}
+			);
+		}
+		var flip = false;
+		for (var n = 0; n < temp.nodelinks.length; n++)
+		{
+			edges.push(
+				{
+					from: temp.nodelinks[n].from,
+					to: temp.nodelinks[n].to,
+					arrows: 'to',
+					smooth: 
+					{
+						type: (
+							temp.nodelinks[n].to == temp.nodelinks[n].from + 1 ? "continuous" : ((flip = !flip) ? "curvedCW" : "curvedCCW")
+						)
+					}
+				}
+			);
+		}
+		scriptFiles.push(temp);
+		scriptFiles[scriptFiles.length -1].name = file.name;
+		scriptFiles[scriptFiles.length -1].hashedName = hashedName;
+		
+		draw();
+		complete = true;
+	};
+	reader.readAsText(file, "UTF-8");
+}
+
 function HandleFiles()
 {
-	console.log(scriptFileInput.files);
 	
 	nodes = [];
 	edges = [];
 	for(i = 0; i < scriptFileInput.files.length; i++)
 	{
-		var reader = new FileReader();
-		var textFile = scriptFileInput.files[i];
-		reader.onload = function(e) {
-			
-		    scriptFiles.push(CompileScript(e.target.result));
-
-		    //nodes.push(
-            //    {
-            //        id: 0,
-            //        label: String(0)
-            //    }
-            //);
-		    for (var n = 0; n < scriptFiles[0].nodes.length; n++)
-		    {
-		        for (var chkpnt = 0; chkpnt < scriptFiles[0].checkpoints.length; chkpnt++) {
-    
-		        }
-		        nodes.push(
-                    {
-		                id: n,
-		                label: String(n),
-		                title: "lmao",
-                        level: n
-                    }
-                );
-		    }
-		    var flipFlop = false;
-		    for (var n = 0; n < scriptFiles[0].nodelinks.length; n++)
-		    {
-		        edges.push(
-                    {
-                        from: scriptFiles[0].nodelinks[n].from,
-                        to: scriptFiles[0].nodelinks[n].to,
-                        arrows: 'to',
-                        smooth: 
-                        {
-                            type: (
-                                scriptFiles[0].nodelinks[n].to == scriptFiles[0].nodelinks[n].from + 1 ? "continuous" : ((flipFlop = !flipFlop) ? "curvedCW" : "curvedCCW")
-                            )
-                        }
-                    }
-                );
-		    }
-			
-			draw();
-		};
-		reader.readAsText(textFile);
+		ReadFileAsText(scriptFileInput.files[i]);
 	}
-	
-	
 }
 
 function destroy() {
@@ -322,7 +327,7 @@ function draw() {
 	        hierarchical: {
 	            direction: "UD",
 	            sortMethod: "directed",
-	            nodeSpacing: 300
+	            nodeSpacing: 250
 	        }
 	    },
 	    interaction: {
@@ -341,8 +346,13 @@ function draw() {
 	// add event listeners
 	network.on('select', function (params) {
 	    if (params.nodes[0] != undefined)
-	        document.getElementById("textbox").value = scriptFiles[0].nodes[params.nodes[0]].text;
-	    else
+		{
+			var temp = nodes.find( function(e){
+				return e.id === params.nodes[0];
+			});
+			document.getElementById("textbox").value = temp.SCRIPT_PTR.text;
+	    }
+		else
 	        document.getElementById("textbox").value = "";
 	});
 }
