@@ -7,6 +7,10 @@ var network = null;
 var scriptFileInput = document.getElementById("fileItem");
 var scriptFiles = [];
 
+// This is filled with functions where the parameters are the complete nodes and complete edges, for any modifications.
+// { func(), storedVariables[] }
+var queuedActions = [];
+
 /* 
 	scriptmusic/scriptBG/scriptSFX = { 
 		filename, 
@@ -174,7 +178,39 @@ function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos, 
             nodeInfo.currentNodeTxt = "";
             break;
         case LINETYPE.LOAD_SCRIPT:
-            // 
+            result.nodelinks.push({ from: hashedName + nodeInfo.currentNode, to: (CURRENT_LINE_SPLIT[1] + ".txt").hashCode() });
+			
+			queuedActions.push(
+				{
+					func: function(completeNodes, completeEdges,storedVariables){
+						for (var n = 0; n < completeNodes.length; n++) 
+						{
+							if(completeNodes[n].id == storedVariables[0])
+							{
+								for (var y = 0; y < (completeNodes.length-n); y++) 
+								{
+									if(completeNodes[n+y].id != storedVariables[0]+y) break;
+									completeNodes[n+y].level = storedVariables[1] + y;
+								}
+								break;
+							};
+						}
+						for (var n = 0; n < completeEdges.length; n++) 
+						{
+							if(completeEdges[n].to == storedVariables[0])
+							{
+								completeEdges[n].smooth = undefined;
+								break;
+							}
+						}
+					},
+					storedVariables: [
+						(CURRENT_LINE_SPLIT[1] + ".txt").hashCode(),
+						nodeInfo.currentNode
+					]
+				}
+			);
+			
             break;
     }
 }
@@ -313,6 +349,12 @@ function ReadFileAsText(file)
 				}
 			);
 		}
+		
+		for (var n = 0; n < queuedActions.length; n++)
+		{
+			queuedActions[n].func(nodes,edges,queuedActions[n].storedVariables);
+		}
+		
 		scriptFiles.push(temp);
 		scriptFiles[scriptFiles.length -1].name = file.name;
 		scriptFiles[scriptFiles.length -1].hashedName = hashedName;

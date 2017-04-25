@@ -1,3 +1,11 @@
 This is test script 3.
 
-This script is also a dead end.
+Oh boy, an if statement!
+
+m22IF test_decision _choice1 Goto node3
+
+	This is node 2 now!
+
+--node3
+
+This is node 5. Yay.
