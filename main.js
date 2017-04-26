@@ -171,8 +171,12 @@ function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos, 
             }
             break;
         case LINETYPE.M22IF:
+			for (var n = 0; n < CURRENT_LINE_SPLIT.length; n++) 
+			{
+				tempLine_c.lineContents += CURRENT_LINE_SPLIT[n] + " ";
+			}
             var paramlinetype = CheckLineType(CURRENT_LINE_SPLIT[3]);
-            result.nodes.push({ text: nodeInfo.currentNodeTxt, pos: linePos });
+            result.nodes.push({ text: nodeInfo.currentNodeTxt + tempLine_c.lineContents, pos: linePos });
             result.nodelinks.push({ from: hashedName + nodeInfo.currentNode, to: hashedName + ++nodeInfo.currentNode });
             result.ifStatements.push({ checkpoint: CURRENT_LINE_SPLIT[4], pos: linePos, node: (nodeInfo.currentNode-1) });
             nodeInfo.currentNodeTxt = "";
@@ -182,7 +186,8 @@ function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos, 
 			
 			queuedActions.push(
 				{
-					func: function(completeNodes, completeEdges,storedVariables){
+					func: function(completeNodes, completeEdges,storedVariables)
+					{
 						for (var n = 0; n < completeNodes.length; n++) 
 						{
 							if(completeNodes[n].id == storedVariables[0])
@@ -204,7 +209,8 @@ function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos, 
 							}
 						}
 					},
-					storedVariables: [
+					storedVariables: 
+					[
 						(CURRENT_LINE_SPLIT[1] + ".txt").hashCode(),
 						nodeInfo.currentNode
 					]
@@ -282,7 +288,8 @@ function CompileScript(hashedName, _scriptStr)
 		{
 		    CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, n, hashedName);
 		}
-		nodeInfo.currentNodeTxt += tempArray[n] + "\n\n";
+		if(tempLine_c.linetype != LINETYPE.M22IF) 
+			nodeInfo.currentNodeTxt += tempArray[n] + "\n\n";
 		result.__scriptCompiled__.push(tempLine_c);
 	}
 	result.nodes.push({ text: nodeInfo.currentNodeTxt, pos: n });
@@ -376,7 +383,8 @@ function HandleFiles()
 	}
 }
 
-function destroy() {
+function destroy() 
+{
 	if (network !== null) {
 		network.destroy();
 		network = null;
@@ -384,7 +392,8 @@ function destroy() {
 }
 
 var options;
-function draw() {
+function draw() 
+{
 	destroy();
 	
 	var data = {
@@ -394,21 +403,33 @@ function draw() {
 
 	// create a network
 	var container = document.getElementById('mynetwork');
-	options = {
-	    layout: {
-	        hierarchical: {
+	options = 
+	{
+	    layout: 
+		{
+	        hierarchical: 
+			{
 	            direction: "UD",
 	            sortMethod: "directed",
 	            nodeSpacing: 250
 	        }
 	    },
-	    interaction: {
+	    interaction: 
+		{
 	        dragNodes: true
 	    },
-	    manipulation: {
-	        enabled: true
+	    manipulation: 
+		{
+	        enabled: true,
+			addNode: function(nodeData,callback)
+			{
+				nodeData.label = 'NewNode';
+				nodeData.level = 1;
+				callback(nodeData);
+			}
 	    },
-	    physics: {
+	    physics: 
+		{
 	        enabled: false
 	    }
 	};
@@ -422,9 +443,19 @@ function draw() {
 			var temp = nodes.find( function(e){
 				return e.id === params.nodes[0];
 			});
-			document.getElementById("textbox").value = temp.SCRIPT_PTR.text;
+			try
+			{
+				editor.setReadOnly(true);
+				//document.getElementById("textbox").value = temp.SCRIPT_PTR.text;
+				editor.setValue(temp.SCRIPT_PTR.text);
+				editor.setReadOnly(false);
+			}
+			catch(err)
+			{
+				console.log(err);
+			}
 	    }
 		else
-	        document.getElementById("textbox").value = "";
+	        editor.setValue("");
 	});
 }
