@@ -7,6 +7,9 @@ var network = null;
 var scriptFileInput = document.getElementById("fileItem");
 var scriptFiles = [];
 
+var filesLoaded = false;
+var selectedNode = null;
+
 // This is filled with functions where the parameters are the complete nodes and complete edges, for any modifications.
 // { func(), storedVariables[] }
 var queuedActions = [];
@@ -335,7 +338,8 @@ function ReadFileAsText(file)
 					label: String(n),
 					title: file.name,
 					level: n,
-					SCRIPT_PTR: temp.nodes[n]
+					SCRIPT_PTR: temp.nodes[n],
+					SCRIPT_TXT: temp.nodes[n].text
 				}
 			);
 		}
@@ -374,13 +378,13 @@ function ReadFileAsText(file)
 
 function HandleFiles()
 {
-	
 	nodes = [];
 	edges = [];
 	for(i = 0; i < scriptFileInput.files.length; i++)
 	{
 		ReadFileAsText(scriptFileInput.files[i]);
 	}
+	filesLoaded = true;
 }
 
 function destroy() 
@@ -424,7 +428,14 @@ function draw()
 			addNode: function(nodeData,callback)
 			{
 				nodeData.label = 'NewNode';
-				nodeData.level = 1;
+				//nodeData.id 
+				nodeData.SCRIPT_TXT = 'No text yet!';
+				nodeData.level = 0;
+				callback(nodeData);
+			},
+			deleteNode: function(nodeData,callback)
+			{
+				editor.setValue("");
 				callback(nodeData);
 			}
 	    },
@@ -440,22 +451,37 @@ function draw()
 	network.on('select', function (params) {
 	    if (params.nodes[0] != undefined)
 		{
-			var temp = nodes.find( function(e){
-				return e.id === params.nodes[0];
-			});
+			if(typeof(selectedNode) != undefined && selectedNode != null)
+			{
+				selectedNode.SCRIPT_TXT = editor.getValue();
+			}
+			for (var property in network.body.data.nodes._data) 
+			{
+				if (property == params.nodes[0]) 
+				{
+					selectedNode = network.body.data.nodes._data[property];
+					break;
+				}
+			}
 			try
 			{
-				editor.setReadOnly(true);
-				//document.getElementById("textbox").value = temp.SCRIPT_PTR.text;
-				editor.setValue(temp.SCRIPT_PTR.text);
-				editor.setReadOnly(false);
+				editor.setValue(selectedNode.SCRIPT_TXT);
 			}
 			catch(err)
 			{
+				alert("Failed to find node data!");
 				console.log(err);
+				console.log(params);
 			}
 	    }
 		else
+		{
+			if(typeof(selectedNode) != undefined)
+			{
+				selectedNode.SCRIPT_TXT = editor.getValue();
+			}
 	        editor.setValue("");
+			selectedNode = null;
+		}
 	});
 }

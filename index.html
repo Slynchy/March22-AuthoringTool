@@ -34,6 +34,8 @@
 <body onload="draw();">
 <h2>March22-AuthoringTool</h2>
 <input id="fileItem" type="file" onchange="HandleFiles()" value="Select Script Files" multiple>
+<br>
+<input id="compileButton" type="button" onclick="console.log('Compiling...')" value="Compile script files" multiple>
 <br><br>
 
 <div id="mynetwork"></div>
@@ -46,6 +48,7 @@
 
 <script>
 	var editor = ace.edit("textbox");
+	editor.$blockScrolling = Infinity;
 	//editor.setTheme("ace/theme/monokai");
 	//editor.getSession().setMode("ace/mode/javascript");
 </script>
