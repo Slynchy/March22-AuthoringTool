@@ -8,20 +8,33 @@
         body {
             font: 10pt sans;
         }
+		
+		#mynetwork,#textbox,#nodeSettings {
+            border: 1px solid gray;
+			position: fixed;
+			overflow: auto;
+			background-color: white;
+		}
 
         #mynetwork {
             width: 60%;
-            height: 800px;
-            border: 1px solid gray;
-			position: fixed;
+            height: 80%;
+			left: 0;
+			top: 12%;
         }
 
         #textbox {
-			position: fixed;
             right: 0;
             width: 40%;
-            height: 800px;
-            border: 1px solid gray;
+            height: 50%;
+			top: 42%;
+        }
+		
+        #nodeSettings {
+            right: 0;
+            width: 40%;
+            height: 30%;
+			top: 12%;
         }
     </style>
 
@@ -41,6 +54,7 @@
 <div id="mynetwork"></div>
 
 <!--<input id="textbox" type="text" name="textbox" value="" readonly="readonly" />-->
+<div id="nodeSettings"></div><br>
 <div id="textbox">Load a script file or start adding nodes!</div>
 
 <p id="selection"></p>
