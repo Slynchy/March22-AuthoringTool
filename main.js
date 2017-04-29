@@ -9,6 +9,20 @@ var scriptFiles = [];
 
 var filesLoaded = false;
 var selectedNode = null;
+var edgesDataset;
+var nodesDataset;
+
+var nodeInfoBoxes = [];
+nodeInfoBoxes.push( document.getElementById("nName") );
+nodeInfoBoxes.push( document.getElementById("nID") );
+nodeInfoBoxes.push( document.getElementById("nFile") );
+nodeInfoBoxes.push( document.getElementById("nLevel") );
+var nodeInfoBoxesIndex = {
+	Name: 0,
+	ID: 1,
+	File: 2,
+	Level: 3
+};
 
 // This is filled with functions where the parameters are the complete nodes and complete edges, for any modifications.
 // { func(), storedVariables[] }
@@ -369,6 +383,9 @@ function ReadFileAsText(file)
 		scriptFiles.push(temp);
 		scriptFiles[scriptFiles.length -1].name = file.name;
 		scriptFiles[scriptFiles.length -1].hashedName = hashedName;
+	
+		nodesDataset = new vis.DataSet(nodes);
+		edgesDataset = new vis.DataSet(edges);
 		
 		draw();
 		complete = true;
@@ -401,8 +418,8 @@ function draw()
 	destroy();
 	
 	var data = {
-		edges: edges,
-		nodes: nodes
+		edges: edgesDataset,
+		nodes: nodesDataset
 	}
 
 	// create a network
@@ -466,6 +483,12 @@ function draw()
 			try
 			{
 				editor.setValue(selectedNode.SCRIPT_TXT);
+				nodeInfoBoxes[nodeInfoBoxesIndex.Name].value = selectedNode.label;
+				nodeInfoBoxes[nodeInfoBoxesIndex.ID].value = selectedNode.id;
+				if(typeof(selectedNode.title) === undefined || selectedNode.title === undefined || selectedNode.title == null)
+					selectedNode.title = "NewScriptFile.txt";
+				nodeInfoBoxes[nodeInfoBoxesIndex.File].value = selectedNode.title;
+				nodeInfoBoxes[nodeInfoBoxesIndex.Level].value = selectedNode.level;
 			}
 			catch(err)
 			{
@@ -476,12 +499,67 @@ function draw()
 	    }
 		else
 		{
-			if(typeof(selectedNode) != undefined)
+			if(typeof(selectedNode) != undefined && selectedNode != null)
 			{
 				selectedNode.SCRIPT_TXT = editor.getValue();
 			}
 	        editor.setValue("");
 			selectedNode = null;
+			for(n = 0; n < nodeInfoBoxes.length; n++)
+			{
+				nodeInfoBoxes[n].value = "";
+			}
 		}
 	});
 }
+
+function UpdateSelectedNode()
+{
+	if(selectedNode != null)
+	{
+		// nodeInfoBoxes[nodeInfoBoxesIndex.Name].value = selectedNode.label;
+		// nodeInfoBoxes[nodeInfoBoxesIndex.ID].value = selectedNode.id;
+		// nodeInfoBoxes[nodeInfoBoxesIndex.File].value = selectedNode.title;
+		// nodeInfoBoxes[nodeInfoBoxesIndex.Level].value = selectedNode.level;
+		var temp = selectedNode.level;
+		if(nodesDataset == null)
+			nodesDataset = network.body.data.nodes;
+		if(edgesDataset == null)
+		{
+			edgesDataset = network.body.data.edges;
+			draw();
+		}
+		
+		nodesDataset.update([ { 
+			id: selectedNode.id, 
+			label:nodeInfoBoxes[nodeInfoBoxesIndex.Name].value,
+			title: nodeInfoBoxes[nodeInfoBoxesIndex.File].value,
+			level: parseInt(nodeInfoBoxes[nodeInfoBoxesIndex.Level].value),
+			SCRIPT_TXT: editor.getValue()
+		} ]);
+		
+		if(parseInt(nodeInfoBoxes[nodeInfoBoxesIndex.Level].value) != temp)
+		{
+			draw();
+		}
+	}
+}
+
+function SaveScripts()
+{
+	//var blob = new Blob(["asf"], {type: "text/plain;charset=utf-8"});
+	//saveAs(blob, "assadaf"+".txt");
+	alert("Saving scripts, please be patient!");
+}
+
+
+
+
+
+
+
+
+
+
+
+

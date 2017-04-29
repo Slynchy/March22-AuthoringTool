@@ -36,10 +36,23 @@
             height: 30%;
 			top: 12%;
         }
+		
+		label {
+			width:50px;
+			clear:left;
+			text-align:right;
+			padding-right:10px;
+		}
+		
+		.nodeItem, label {
+			float:left;
+		}
+		
     </style>
 
 	<script src="./js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" src="./js/visjs/vis.min.js"></script>
+    <script type="text/javascript" src="./js/FileSaver.min.js"></script>
     <link href="./js/visjs/vis.min.css" rel="stylesheet" type="text/css"/>
    
 </head>
@@ -48,13 +61,23 @@
 <h2>March22-AuthoringTool</h2>
 <input id="fileItem" type="file" onchange="HandleFiles()" value="Select Script Files" multiple>
 <br>
-<input id="compileButton" type="button" onclick="console.log('Compiling...')" value="Compile script files" multiple>
+<input id="compileButton" type="button" onclick="SaveScripts()" value="Compile script files" multiple>
 <br><br>
 
 <div id="mynetwork"></div>
 
 <!--<input id="textbox" type="text" name="textbox" value="" readonly="readonly" />-->
-<div id="nodeSettings"></div><br>
+<div id="nodeSettings">
+	<br>
+	<label>Title: </label><input class="nodeItem" type="text" id="nName" oninput="UpdateSelectedNode()"></input>
+	<br><br>
+	<label>ID: </label><input class="nodeItem" type="text" id="nID" oninput="UpdateSelectedNode()" readonly></input>
+	<br><br>
+	<label>Script file: </label><input class="nodeItem" type="text" id="nFile" oninput="UpdateSelectedNode()"></input>
+	<br><br>
+	<label>Tree level: </label><input class="nodeItem" type="text" id="nLevel" oninput="UpdateSelectedNode()"></input>
+</div>
+
 <div id="textbox">Load a script file or start adding nodes!</div>
 
 <p id="selection"></p>
