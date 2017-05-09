@@ -457,6 +457,12 @@ function draw()
 			},
 			addEdge: function(edgeData,callback) 
 			{
+			    if (edgeData.from === edgeData.to) 
+			    {
+			        alert("You can't connect a node to itself!");
+			        callback(edgeData);
+			        return;
+			    }
 				if(selectedNode != null)
 				{
 					editor.setValue("");
@@ -470,30 +476,19 @@ function draw()
 				if(nodesDataset === undefined)
 					nodesDataset = network.body.data.nodes;
 				
-				if(nodesDataset._data[edgeData.from].title == nodesDataset._data[edgeData.to].title)
+				if(nodesDataset._data[edgeData.from].title == nodesDataset._data[edgeData.to].title || nodesDataset._data[edgeData.to].title === undefined || nodesDataset._data[edgeData.from].title === undefined)
 				{
 					nodesDataset._data[edgeData.from].SCRIPT_TXT += "\n\nGoto " + edgeData.to;
 					nodesDataset._data[edgeData.to].SCRIPT_TXT = "--" + edgeData.to + "\n\n" + nodesDataset._data[edgeData.to].SCRIPT_TXT;
 				}
 				else
 				{
-					nodesDataset._data[edgeData.from].SCRIPT_TXT += "\n\nLoadScript " + nodesDataset._data[edgeData.to].title;
+				    debugger;
+				    nodesDataset._data[edgeData.from].SCRIPT_TXT += "\n\nLoadScript " + nodesDataset._data[edgeData.to].title;
 				}
-				debugger;
 				
 				UpdateSelectedNode();
-				if (edgeData.from === edgeData.to) 
-				{
-					var r = confirm("Do you want to connect the node to itself?");
-					if (r === true) 
-					{
-					  callback(edgeData);
-					}
-				}
-				else 
-				{
-					callback(edgeData);
-				}
+				callback(edgeData);
 			}
 	    },
 	    physics: 
