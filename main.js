@@ -157,7 +157,7 @@ function CompileLine(CURRENT_LINE_SPLIT, tempLine_c, result, nodeInfo, linePos, 
         case LINETYPE.NEW_PAGE:
             break;
         case LINETYPE.PLAY_MUSIC:
-            tempLine_c.lineContents = (tempArray[linePos]);
+            //tempLine_c.lineContents = (tempArray[linePos]);
             tempLine_c.params_txt.push(CURRENT_LINE_SPLIT[1]);
             if (FindLoadedAsset(CURRENT_LINE_SPLIT[1], result.music) === undefined) {
                 result.music.push(
