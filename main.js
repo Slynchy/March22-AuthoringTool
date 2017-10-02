@@ -175,23 +175,23 @@ function UpdateSelectedNode()
 		// nodeInfoBoxes[nodeInfoBoxesIndex.File].value = GLOBALS.selectedNode.title;
 		// nodeInfoBoxes[nodeInfoBoxesIndex.Level].value = GLOBALS.selectedNode.level;
 		var temp = GLOBALS.selectedNode.level;
-		if(nodesDataset == null)
-			nodesDataset = network.body.data.nodes;
-		if(edgesDataset == null)
+		if(GLOBALS.nodesDataset == null)
+			GLOBALS.nodesDataset = GLOBALS.network.body.data.nodes;
+		if(GLOBALS.edgesDataset == null)
 		{
-			edgesDataset = network.body.data.edges;
+			GLOBALS.edgesDataset = GLOBALS.network.body.data.edges;
 			draw();
 		}
 		
-		nodesDataset.update([ { 
+		GLOBALS.nodesDataset.update([ { 
 			id: GLOBALS.selectedNode.id, 
-			label:nodeInfoBoxes[nodeInfoBoxesIndex.Name].value,
-			title: nodeInfoBoxes[nodeInfoBoxesIndex.File].value,
-			level: parseInt(nodeInfoBoxes[nodeInfoBoxesIndex.Level].value),
+			label: GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.Name].value,
+			title: GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.File].value,
+			level: parseInt(GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.Level].value),
 			SCRIPT_TXT: editor.getValue()
 		} ]);
 		
-		if(parseInt(nodeInfoBoxes[nodeInfoBoxesIndex.Level].value) != temp)
+		if(parseInt(GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.Level].value) != temp)
 		{
 			draw();
 		}
