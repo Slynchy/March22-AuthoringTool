@@ -40,3 +40,8 @@ label {
 .nodeItem, label {
     float:left;
 }
+
+.nodeSetting {
+    /*margin-top: 15px;*/
+    padding: 3%;
+}

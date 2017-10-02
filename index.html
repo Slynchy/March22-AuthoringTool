@@ -23,14 +23,10 @@
 
 <!--<input id="textbox" type="text" name="textbox" value="" readonly="readonly" />-->
 <div id="nodeSettings">
-	<br>
-	<label>Title: </label><input class="nodeItem" type="text" id="nName" oninput="UpdateSelectedNode()"></input>
-	<br><br>
-	<label>ID: </label><input class="nodeItem" type="text" id="nID" oninput="UpdateSelectedNode()" readonly></input>
-	<br><br>
-	<label>Script file: </label><input class="nodeItem" type="text" id="nFile" oninput="UpdateSelectedNode()"></input>
-	<br><br>
-	<label>Tree level: </label><input class="nodeItem" type="number" id="nLevel" onchange="UpdateSelectedNode()"></input>
+	<div class="nodeSetting"><label>Title: </label><input class="nodeItem" type="text" id="nName" oninput="UpdateSelectedNode()"></input></div>
+	<!-- <div class="nodeSetting"><label>ID: </label><input class="nodeItem" type="text" id="nID" oninput="UpdateSelectedNode()" readonly></input></div> -->
+	<div class="nodeSetting"><label>Script file: </label><input class="nodeItem" type="text" id="nFile" oninput="UpdateSelectedNode()"></input></div>
+	<div class="nodeSetting"><label>Tree level: </label><input class="nodeItem" type="number" id="nLevel" onchange="UpdateSelectedNode()"></input></div>
 </div>
 
 <div id="textbox">Load a script file or start adding nodes!</div>
@@ -44,6 +40,20 @@
 	//editor.setTheme("ace/theme/monokai");
 	//editor.getSession().setMode("ace/mode/javascript");
 </script>
-<script type="text/javascript" src="main.js"></script>
+<script type="text/javascript" src="js/JSLoader.js"></script>
+<script type="text/javascript">
+	Loader.load('js/March22/Globals.js', function() {
+		Loader.load('js/March22/HTML.js', function() {
+			Loader.load('js/March22/Functionality.js', function() {
+				Loader.load('js/March22/M22Compiler.js', function() {
+					Loader.load('main.js', function() {
+						console.log("Initializing main.js...");
+					});
+				});
+			});
+		});
+	});
+</script>
+<!-- <script type="text/javascript" src="main.js"></script> -->
     
 </html>
