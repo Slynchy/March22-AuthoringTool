@@ -1,0 +1,42 @@
+body {
+    font: 10pt sans;
+}
+
+#mynetwork,#textbox,#nodeSettings {
+    border: 1px solid gray;
+    position: fixed;
+    overflow: auto;
+    background-color: white;
+}
+
+#mynetwork {
+    width: 60%;
+    height: 80%;
+    left: 0;
+    bottom: 0%;
+}
+
+#textbox {
+    right: 0;
+    width: 40%;
+    height: 50%;
+    bottom: 0%;
+}
+
+#nodeSettings {
+    right: 0;
+    width: 40%;
+    height: 30%;
+    bottom: 50%;
+}
+
+label {
+    width:50px;
+    clear:left;
+    text-align:right;
+    padding-right:10px;
+}
+
+.nodeItem, label {
+    float:left;
+}
