@@ -9,8 +9,8 @@ Globals = function()
 	
 	this.filesLoaded = false;
 	this.selectedNode = null;
-	this.edgesDataset = null;
-	this.nodesDataset = null;
+	this.nodesDataset = new vis.DataSet();
+	this.edgesDataset = new vis.DataSet();
 	
 	this.nodeInfoBoxesIndex = {
 		Name: 0,

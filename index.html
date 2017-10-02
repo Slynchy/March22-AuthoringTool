@@ -9,6 +9,7 @@
     <script type="text/javascript" src="./js/visjs/vis.min.js"></script>
     <script type="text/javascript" src="./js/FileSaver.min.js"></script>
     <link href="./js/visjs/vis.min.css" rel="stylesheet" type="text/css"/>
+	<img class="bannerimg" src="img/March22Banner.png"></img>
    
 </head>
 
@@ -46,8 +47,10 @@
 		Loader.load('js/March22/HTML.js', function() {
 			Loader.load('js/March22/Functionality.js', function() {
 				Loader.load('js/March22/M22Compiler.js', function() {
-					Loader.load('main.js', function() {
-						console.log("Initializing main.js...");
+					Loader.load('js/March22/M22vis.js', function() {
+						Loader.load('main.js', function() {
+							console.log("Initializing main.js...");
+						});
 					});
 				});
 			});
