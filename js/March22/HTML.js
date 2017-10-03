@@ -1,7 +1,7 @@
 
-GLOBALS.nodeInfoBoxes.push( document.getElementById("nName") );
-GLOBALS.nodeInfoBoxes.push( document.getElementById("nID") );
-GLOBALS.nodeInfoBoxes.push( document.getElementById("nFile") );
-GLOBALS.nodeInfoBoxes.push( document.getElementById("nLevel") );
+gl.nodeInfoBoxes.push( document.getElementById("nName") );
+gl.nodeInfoBoxes.push( document.getElementById("nID") );
+gl.nodeInfoBoxes.push( document.getElementById("nFile") );
+gl.nodeInfoBoxes.push( document.getElementById("nLevel") );
 
-GLOBALS.scriptFileInput = document.getElementById("fileItem");
+gl.scriptFileInput = document.getElementById("fileItem");

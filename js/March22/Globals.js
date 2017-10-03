@@ -1,5 +1,8 @@
 Globals = function()
 {
+	this.aceEditor = ace.edit("textbox");
+	this.aceEditor.$blockScrolling = Infinity;
+
 	this.nodes = null;
 	this.edges = null;
 	this.network = null;
@@ -23,4 +26,4 @@ Globals = function()
 	this.selectedNode = null;
 };
 
-var GLOBALS = new Globals();
+var gl = new Globals();
