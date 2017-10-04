@@ -5,9 +5,6 @@
     <title>March22-AuthoringTool</title>
 	<link rel="stylesheet" type="text/css" href="main.css">
 
-	<script src="./js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script type="text/javascript" src="./js/visjs/vis.min.js"></script>
-    <script type="text/javascript" src="./js/FileSaver.min.js"></script>
     <link href="./js/visjs/vis.min.css" rel="stylesheet" type="text/css"/>
 	<img class="bannerimg" src="img/March22Banner.png"></img>
    
@@ -35,21 +32,33 @@
 <p id="selection"></p>
 </body>
 
-<script>
-	var editor = ace.edit("textbox");
-	editor.$blockScrolling = Infinity;
-	//editor.setTheme("ace/theme/monokai");
-	//editor.getSession().setMode("ace/mode/javascript");
-</script>
 <script type="text/javascript" src="js/JSLoader.js"></script>
 <script type="text/javascript">
-	Loader.load('js/March22/Globals.js', function() {
-		Loader.load('js/March22/HTML.js', function() {
-			Loader.load('js/March22/Functionality.js', function() {
-				Loader.load('js/March22/M22Compiler.js', function() {
-					Loader.load('js/March22/M22vis.js', function() {
-						Loader.load('main.js', function() {
-							console.log("Initializing main.js...");
+	var _BOOTORDER = {
+		Ace: "js/ace/ace.js",
+		VisJS: "js/visjs/vis.min.js",
+		FileSaver: "js/FileSaver.min.js",
+		Globals: "js/March22/Globals.js",
+		HTML: "js/March22/HTML.js",
+		Functionality: "js/March22/Functionality.js",
+		M22Compiler: "js/March22/M22Compiler.js",
+		M22vis: "js/March22/M22vis.js",
+		main: "main.js"
+	};
+
+	Loader.load('js/ace/ace.js', function() {
+		Loader.load('js/visjs/vis.min.js', function() {
+			Loader.load('js/FileSaver.min.js', function() {
+				Loader.load('js/March22/Globals.js', function() {
+					Loader.load('js/March22/HTML.js', function() {
+						Loader.load('js/March22/Functionality.js', function() {
+							Loader.load('js/March22/M22Compiler.js', function() {
+								Loader.load('js/March22/M22vis.js', function() {
+									Loader.load('main.js', function() {
+										console.log("Initializing main.js...");
+									});
+								});
+							});
 						});
 					});
 				});

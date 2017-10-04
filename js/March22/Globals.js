@@ -1,5 +1,8 @@
 Globals = function()
 {
+	this.aceEditor = ace.edit("textbox");
+	this.aceEditor.$blockScrolling = Infinity;
+
 	this.nodes = null;
 	this.edges = null;
 	this.network = null;
@@ -18,9 +21,32 @@ Globals = function()
 		File: 2,
 		Level: 3
 	};
-	this.options = null;
+	this.options =
+	{
+	    layout: 
+		{
+	        hierarchical: 
+			{
+	            direction: "UD",
+	            sortMethod: "directed",
+	            nodeSpacing: 250
+	        }
+	    },
+	    interaction: 
+		{
+	        dragNodes: true
+	    },
+	    manipulation: 
+		{
+	        enabled: true,
+	    },
+	    physics: 
+		{
+	        enabled: false
+	    }
+	};
 
 	this.selectedNode = null;
 };
 
-var GLOBALS = new Globals();
+var gl = new Globals();

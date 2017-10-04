@@ -12,13 +12,13 @@ function CompileNode(_scriptStr, _scriptStrPos, result)
 
 function HandleFiles()
 {
-	GLOBALS.nodes = [];
-	GLOBALS.edges = [];
-	for(i = 0; i < GLOBALS.scriptFileInput.files.length; i++)
+	gl.nodes = [];
+	gl.edges = [];
+	for(i = 0; i < gl.scriptFileInput.files.length; i++)
 	{
-		ReadFileAsText(GLOBALS.scriptFileInput.files[i]);
+		ReadFileAsText(gl.scriptFileInput.files[i]);
 	}
-	GLOBALS.filesLoaded = true;
+	gl.filesLoaded = true;
 }
 
 async function SaveScripts_Async()
@@ -26,14 +26,14 @@ async function SaveScripts_Async()
 	var resultFiles = [];
 	var numOfFiles = 0;
 	var files = [];
-	var nodeIds = GLOBALS.nodesDataset.getIds();
+	var nodeIds = gl.nodesDataset.getIds();
 	var length = nodeIds.length;
 	for(i = 0; i < length; i++)
 	{
 		var fnameFound = -1;
 		for(f = 0; f < files.length; f++)
 		{
-			if(files[f].name === GLOBALS.nodesDataset._data[nodeIds[i]].title)
+			if(files[f].name === gl.nodesDataset._data[nodeIds[i]].title)
 			{
 				fnameFound = f;
 				break;
@@ -44,15 +44,15 @@ async function SaveScripts_Async()
 			numOfFiles++;
 			
 			var tempFile = {
-				name: GLOBALS.nodesDataset._data[nodeIds[i]].title,
+				name: gl.nodesDataset._data[nodeIds[i]].title,
 				nodes: []
 			};
-			tempFile.nodes.push(GLOBALS.nodesDataset._data[nodeIds[i]]);
+			tempFile.nodes.push(gl.nodesDataset._data[nodeIds[i]]);
 			files.push(tempFile);
 		}
 		else
 		{
-			files[fnameFound].nodes.push(GLOBALS.nodesDataset._data[nodeIds[i]]);
+			files[fnameFound].nodes.push(gl.nodesDataset._data[nodeIds[i]]);
 		}
 	}
 	
@@ -71,7 +71,9 @@ async function SaveScripts_Async()
 		var result = "";
 		for(n = 0; n < files[i].nodes.length; n++)
 		{ 
+			result += files[i].nodes[n].startOfNode + "\n\n";
 			result += files[i].nodes[n].SCRIPT_TXT + "\n\n";
+			result += "\n\n" + files[i].nodes[n].endOfNode + "\n\n";
 		}
 		//resultFiles[files[i].name] = result;
 		var blob = new Blob([result], {type: "text/plain;charset=utf-8"});

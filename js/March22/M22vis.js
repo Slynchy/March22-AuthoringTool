@@ -1,9 +1,81 @@
 
+onAddNode = function(nodeData, callback)
+{
+	nodeData.label = 'NewNode';
+	nodeData.SCRIPT_TXT = 'No text yet!';
+	nodeData.startOfNode = '';
+	nodeData.endOfNode = '';
+	nodeData.level = 0;
+	callback(nodeData);
+}
+
+onDeleteNode = function(nodeData,callback)
+{
+	gl.aceEditor.setValue("");
+	callback(nodeData);
+}
+
+onDeleteEdge = function(edgeData,callback)
+{
+	var fromNode = gl.edgesDataset._data[edgeData.edges[0]].from;
+	var toNode = gl.edgesDataset._data[edgeData.edges[0]].to;
+	fromNode = gl.nodesDataset._data[fromNode];
+	toNode = gl.nodesDataset._data[toNode];
+
+	fromNode.endOfNode = "";
+	toNode.startOfNode = "";
+
+	callback(edgeData);
+}
+
+onAddEdge = function(edgeData,callback) 
+{
+	if (edgeData.from === edgeData.to) 
+	{
+		alert("You can't connect a node to itself!");
+		callback(edgeData);
+		return;
+	}
+
+	var fromNode = gl.nodesDataset._data[edgeData.from];
+	var toNode = gl.nodesDataset._data[edgeData.to];
+
+	if(gl.selectedNode != null)
+	{
+		gl.aceEditor.setValue("");
+		gl.selectedNode = null;
+		for(n = 0; n < gl.nodeInfoBoxes.length; n++)
+		{
+			if(gl.nodeInfoBoxes[n])
+				gl.nodeInfoBoxes[n].value = "";
+		}
+	}
+	edgeData.arrows = 'to';
+	if(gl.nodesDataset === undefined)
+		gl.nodesDataset = gl.network.body.data.nodes;
+	
+	if(fromNode.title == toNode.title || toNode.title === undefined || fromNode.title === undefined)
+	{
+		fromNode.endOfNode = "\n\nGoto " + edgeData.to;
+		//fromNode.SCRIPT_TXT += "\n\nGoto " + edgeData.to;
+		toNode.startOfNode = "--" + edgeData.to + "\n\n";
+		//toNode.SCRIPT_TXT = "--" + edgeData.to + "\n\n" + toNode.SCRIPT_TXT;
+	}
+	else
+	{
+		//fromNode.SCRIPT_TXT += "\n\nLoadScript " + toNode.title;
+		romNode.endOfNode = "\n\nLoadScript " + toNode.title;
+	}
+	
+	UpdateSelectedNode();
+	callback(edgeData);
+}
+
 function destroy() 
 {
-	if (GLOBALS.network !== null) {
-		GLOBALS.network.destroy();
-		GLOBALS.network = null;
+	if (gl.network !== null) {
+		gl.network.destroy();
+		gl.network = null;
 	}
 }
 
@@ -12,13 +84,13 @@ function draw()
 	destroy();
 	
 	var data = {
-		edges: GLOBALS.edgesDataset,
-		nodes: GLOBALS.nodesDataset
+		edges: gl.edgesDataset,
+		nodes: gl.nodesDataset
 	}
 
 	// create a network
 	var container = document.getElementById('mynetwork');
-	GLOBALS.options = 
+	gl.options = 
 	{
 	    layout: 
 		{
@@ -36,54 +108,10 @@ function draw()
 	    manipulation: 
 		{
 	        enabled: true,
-			addNode: function(nodeData,callback)
-			{
-				nodeData.label = 'NewNode';
-				//nodeData.id 
-				nodeData.SCRIPT_TXT = 'No text yet!';
-				nodeData.level = 0;
-				callback(nodeData);
-			},
-			deleteNode: function(nodeData,callback)
-			{
-				editor.setValue("");
-				callback(nodeData);
-			},
-			addEdge: function(edgeData,callback) 
-			{
-			    if (edgeData.from === edgeData.to) 
-			    {
-			        alert("You can't connect a node to itself!");
-			        callback(edgeData);
-			        return;
-			    }
-				if(GLOBALS.selectedNode != null)
-				{
-					editor.setValue("");
-					GLOBALS.selectedNode = null;
-					for(n = 0; n < GLOBALS.nodeInfoBoxes.length; n++)
-					{
-						if(GLOBALS.nodeInfoBoxes[n])
-							GLOBALS.nodeInfoBoxes[n].value = "";
-					}
-				}
-				edgeData.arrows = 'to';
-				if(GLOBALS.nodesDataset === undefined)
-					GLOBALS.nodesDataset = GLOBALS.network.body.data.nodes;
-				
-				if(GLOBALS.nodesDataset._data[edgeData.from].title == GLOBALS.nodesDataset._data[edgeData.to].title || GLOBALS.nodesDataset._data[edgeData.to].title === undefined || GLOBALS.nodesDataset._data[edgeData.from].title === undefined)
-				{
-					GLOBALS.nodesDataset._data[edgeData.from].SCRIPT_TXT += "\n\nGoto " + edgeData.to;
-					GLOBALS.nodesDataset._data[edgeData.to].SCRIPT_TXT = "--" + edgeData.to + "\n\n" + GLOBALS.nodesDataset._data[edgeData.to].SCRIPT_TXT;
-				}
-				else
-				{
-				    GLOBALS.nodesDataset._data[edgeData.from].SCRIPT_TXT += "\n\nLoadScript " + GLOBALS.nodesDataset._data[edgeData.to].title;
-				}
-				
-				UpdateSelectedNode();
-				callback(edgeData);
-			}
+			addNode: onAddNode,
+			deleteNode: onDeleteNode,
+			deleteEdge: onDeleteEdge,
+			addEdge: onAddEdge,
 	    },
 	    physics: 
 		{
@@ -91,34 +119,34 @@ function draw()
 	    }
 	};
 
-	GLOBALS.network = new vis.Network(container, data, GLOBALS.options);
+	gl.network = new vis.Network(container, data, gl.options);
 
 	// add event listeners
-	GLOBALS.network.on('select', function (params) {
+	gl.network.on('select', function (params) {
 	    if (params.nodes[0] != undefined)
 		{
-			if(typeof(GLOBALS.selectedNode) != undefined && GLOBALS.selectedNode != null)
+			if(typeof(gl.selectedNode) != undefined && gl.selectedNode != null)
 			{
-				GLOBALS.selectedNode.SCRIPT_TXT = editor.getValue();
+				gl.selectedNode.SCRIPT_TXT = gl.aceEditor.getValue();
 			}
-			for (var property in GLOBALS.network.body.data.nodes._data) 
+			for (var property in gl.network.body.data.nodes._data) 
 			{
 				if (property == params.nodes[0]) 
 				{
-					GLOBALS.selectedNode = GLOBALS.network.body.data.nodes._data[property];
+					gl.selectedNode = gl.network.body.data.nodes._data[property];
 					break;
 				}
 			}
 			try
 			{
-				editor.setValue(GLOBALS.selectedNode.SCRIPT_TXT);
-				GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.Name].value = GLOBALS.selectedNode.label;
-				if(GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.ID])
-					GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.ID].value = GLOBALS.selectedNode.id;
-				if(typeof(GLOBALS.selectedNode.title) === undefined || GLOBALS.selectedNode.title === undefined || GLOBALS.selectedNode.title == null)
-					GLOBALS.selectedNode.title = "NewScriptFile.txt";
-				GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.File].value = GLOBALS.selectedNode.title;
-				GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.Level].value = GLOBALS.selectedNode.level;
+				gl.aceEditor.setValue(gl.selectedNode.SCRIPT_TXT);
+				gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Name].value = gl.selectedNode.label;
+				if(gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.ID])
+					gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.ID].value = gl.selectedNode.id;
+				if(typeof(gl.selectedNode.title) === undefined || gl.selectedNode.title === undefined || gl.selectedNode.title == null)
+					gl.selectedNode.title = "NewScriptFile.txt";
+				gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.File].value = gl.selectedNode.title;
+				gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Level].value = gl.selectedNode.level;
 			}
 			catch(err)
 			{
@@ -129,16 +157,16 @@ function draw()
 	    }
 		else
 		{
-			if(typeof(GLOBALS.selectedNode) != undefined && GLOBALS.selectedNode != null)
+			if(typeof(gl.selectedNode) != undefined && gl.selectedNode != null)
 			{
-				GLOBALS.selectedNode.SCRIPT_TXT = editor.getValue();
+				gl.selectedNode.SCRIPT_TXT = gl.aceEditor.getValue();
 			}
-	        editor.setValue("");
-			GLOBALS.selectedNode = null;
-			for(n = 0; n < GLOBALS.nodeInfoBoxes.length; n++)
+	        gl.aceEditor.setValue("");
+			gl.selectedNode = null;
+			for(n = 0; n < gl.nodeInfoBoxes.length; n++)
 			{
-				if(GLOBALS.nodeInfoBoxes[n])
-					GLOBALS.nodeInfoBoxes[n].value = "";
+				if(gl.nodeInfoBoxes[n])
+					gl.nodeInfoBoxes[n].value = "";
 			}
 		}
 	});
@@ -146,30 +174,26 @@ function draw()
 
 function UpdateSelectedNode()
 {
-	if(GLOBALS.selectedNode != null)
+	if(gl.selectedNode != null)
 	{
-		// nodeInfoBoxes[nodeInfoBoxesIndex.Name].value = GLOBALS.selectedNode.label;
-		// nodeInfoBoxes[nodeInfoBoxesIndex.ID].value = GLOBALS.selectedNode.id;
-		// nodeInfoBoxes[nodeInfoBoxesIndex.File].value = GLOBALS.selectedNode.title;
-		// nodeInfoBoxes[nodeInfoBoxesIndex.Level].value = GLOBALS.selectedNode.level;
-		var temp = GLOBALS.selectedNode.level;
-		if(GLOBALS.nodesDataset == null)
-			GLOBALS.nodesDataset = GLOBALS.network.body.data.nodes;
-		if(GLOBALS.edgesDataset == null)
+		var temp = gl.selectedNode.level;
+		if(gl.nodesDataset == null)
+			gl.nodesDataset = gl.network.body.data.nodes;
+		if(gl.edgesDataset == null)
 		{
-			GLOBALS.edgesDataset = GLOBALS.network.body.data.edges;
+			gl.edgesDataset = gl.network.body.data.edges;
 			draw();
 		}
 		
-		GLOBALS.nodesDataset.update([ { 
-			id: GLOBALS.selectedNode.id, 
-			label: GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.Name].value,
-			title: GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.File].value,
-			level: parseInt(GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.Level].value),
-			SCRIPT_TXT: editor.getValue()
+		gl.nodesDataset.update([ { 
+			id: gl.selectedNode.id, 
+			label: gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Name].value,
+			title: gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.File].value,
+			level: parseInt(gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Level].value),
+			SCRIPT_TXT: gl.aceEditor.getValue()
 		} ]);
 		
-		if(parseInt(GLOBALS.nodeInfoBoxes[GLOBALS.nodeInfoBoxesIndex.Level].value) != temp)
+		if(parseInt(gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Level].value) != temp)
 		{
 			draw();
 		}
