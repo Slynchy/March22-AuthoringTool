@@ -13,6 +13,7 @@ function CompileNode(_scriptStr, _scriptStrPos, result)
 function HandleFiles()
 {
 	var file = "";
+	gl.scriptFileInput = document.getElementById("projectLoadButton");
 	for(i = 0; i < gl.scriptFileInput.files.length; i++)
 	{
 		file = (gl.scriptFileInput.files[i]);
