@@ -10,6 +10,11 @@ function CompileNode(_scriptStr, _scriptStrPos, result)
     // returns the new script str pos
 }
 
+function CreateLoadMenu()
+{
+	ModalManager.createModal('<input id="projectLoadButton" type="file" onchange="HandleFiles();" title="Select Script Files">');
+}
+
 function HandleFiles()
 {
 	var file = "";

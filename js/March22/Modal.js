@@ -3,9 +3,13 @@ ModalManager = function()
 
 }
 
-ModalManager.createModal = function()
+ModalManager.createModal = function(content)
 {
-    var html = '<div id="myModal" class="modal"> <!-- Modal content --> <div class="modal-content"> <span class="close">&times;</span><input id="projectLoadButton" type="file" onchange="HandleFiles();" title="Select Script Files"> </div> </div>';
+    var html = "";
+    if(!content)
+        html = '<div id="myModal" class="modal"> <!-- Modal content --> <div class="modal-content"> <span class="close">&times;</span> </div> </div>';
+    else
+        html = '<div id="myModal" class="modal"> <!-- Modal content --> <div class="modal-content"> <span class="close">&times;</span> ' + content + ' </div> </div>'
     var e = document.createElement('div');
     e.innerHTML = html;
     document.getElementById("body").appendChild(e);
