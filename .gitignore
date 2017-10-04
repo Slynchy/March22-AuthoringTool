@@ -770,3 +770,5 @@ js/visjs/vis\.map
 js/visjs/vis\.min\.css
 
 js/visjs/vis\.min\.js
+
+\.vscode/

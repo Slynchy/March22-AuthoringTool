@@ -40,3 +40,16 @@ label {
 .nodeItem, label {
     float:left;
 }
+
+.nodeSetting {
+    /*margin-top: 15px;*/
+    padding: 3%;
+}
+
+.bannerimg {
+    position: re
+    right: 0%;
+    top: 0%;
+    width: 2%;
+    height: 2%;
+}
