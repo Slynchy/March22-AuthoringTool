@@ -71,7 +71,9 @@ async function SaveScripts_Async()
 		var result = "";
 		for(n = 0; n < files[i].nodes.length; n++)
 		{ 
+			result += files[i].nodes[n].startOfNode + "\n\n";
 			result += files[i].nodes[n].SCRIPT_TXT + "\n\n";
+			result += "\n\n" + files[i].nodes[n].endOfNode + "\n\n";
 		}
 		//resultFiles[files[i].name] = result;
 		var blob = new Blob([result], {type: "text/plain;charset=utf-8"});

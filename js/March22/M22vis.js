@@ -1,4 +1,76 @@
 
+onAddNode = function(nodeData, callback)
+{
+	nodeData.label = 'NewNode';
+	nodeData.SCRIPT_TXT = 'No text yet!';
+	nodeData.startOfNode = '';
+	nodeData.endOfNode = '';
+	nodeData.level = 0;
+	callback(nodeData);
+}
+
+onDeleteNode = function(nodeData,callback)
+{
+	gl.aceEditor.setValue("");
+	callback(nodeData);
+}
+
+onDeleteEdge = function(edgeData,callback)
+{
+	var fromNode = gl.edgesDataset._data[edgeData.edges[0]].from;
+	var toNode = gl.edgesDataset._data[edgeData.edges[0]].to;
+	fromNode = gl.nodesDataset._data[fromNode];
+	toNode = gl.nodesDataset._data[toNode];
+
+	fromNode.endOfNode = "";
+	toNode.startOfNode = "";
+
+	callback(edgeData);
+}
+
+onAddEdge = function(edgeData,callback) 
+{
+	if (edgeData.from === edgeData.to) 
+	{
+		alert("You can't connect a node to itself!");
+		callback(edgeData);
+		return;
+	}
+
+	var fromNode = gl.nodesDataset._data[edgeData.from];
+	var toNode = gl.nodesDataset._data[edgeData.to];
+
+	if(gl.selectedNode != null)
+	{
+		gl.aceEditor.setValue("");
+		gl.selectedNode = null;
+		for(n = 0; n < gl.nodeInfoBoxes.length; n++)
+		{
+			if(gl.nodeInfoBoxes[n])
+				gl.nodeInfoBoxes[n].value = "";
+		}
+	}
+	edgeData.arrows = 'to';
+	if(gl.nodesDataset === undefined)
+		gl.nodesDataset = gl.network.body.data.nodes;
+	
+	if(fromNode.title == toNode.title || toNode.title === undefined || fromNode.title === undefined)
+	{
+		fromNode.endOfNode = "\n\nGoto " + edgeData.to;
+		//fromNode.SCRIPT_TXT += "\n\nGoto " + edgeData.to;
+		toNode.startOfNode = "--" + edgeData.to + "\n\n";
+		//toNode.SCRIPT_TXT = "--" + edgeData.to + "\n\n" + toNode.SCRIPT_TXT;
+	}
+	else
+	{
+		//fromNode.SCRIPT_TXT += "\n\nLoadScript " + toNode.title;
+		romNode.endOfNode = "\n\nLoadScript " + toNode.title;
+	}
+	
+	UpdateSelectedNode();
+	callback(edgeData);
+}
+
 function destroy() 
 {
 	if (gl.network !== null) {
@@ -36,54 +108,10 @@ function draw()
 	    manipulation: 
 		{
 	        enabled: true,
-			addNode: function(nodeData,callback)
-			{
-				nodeData.label = 'NewNode';
-				//nodeData.id 
-				nodeData.SCRIPT_TXT = 'No text yet!';
-				nodeData.level = 0;
-				callback(nodeData);
-			},
-			deleteNode: function(nodeData,callback)
-			{
-				gl.aceEditor.setValue("");
-				callback(nodeData);
-			},
-			addEdge: function(edgeData,callback) 
-			{
-			    if (edgeData.from === edgeData.to) 
-			    {
-			        alert("You can't connect a node to itself!");
-			        callback(edgeData);
-			        return;
-			    }
-				if(gl.selectedNode != null)
-				{
-					gl.aceEditor.setValue("");
-					gl.selectedNode = null;
-					for(n = 0; n < gl.nodeInfoBoxes.length; n++)
-					{
-						if(gl.nodeInfoBoxes[n])
-							gl.nodeInfoBoxes[n].value = "";
-					}
-				}
-				edgeData.arrows = 'to';
-				if(gl.nodesDataset === undefined)
-					gl.nodesDataset = gl.network.body.data.nodes;
-				
-				if(gl.nodesDataset._data[edgeData.from].title == gl.nodesDataset._data[edgeData.to].title || gl.nodesDataset._data[edgeData.to].title === undefined || gl.nodesDataset._data[edgeData.from].title === undefined)
-				{
-					gl.nodesDataset._data[edgeData.from].SCRIPT_TXT += "\n\nGoto " + edgeData.to;
-					gl.nodesDataset._data[edgeData.to].SCRIPT_TXT = "--" + edgeData.to + "\n\n" + gl.nodesDataset._data[edgeData.to].SCRIPT_TXT;
-				}
-				else
-				{
-				    gl.nodesDataset._data[edgeData.from].SCRIPT_TXT += "\n\nLoadScript " + gl.nodesDataset._data[edgeData.to].title;
-				}
-				
-				UpdateSelectedNode();
-				callback(edgeData);
-			}
+			addNode: onAddNode,
+			deleteNode: onDeleteNode,
+			deleteEdge: onDeleteEdge,
+			addEdge: onAddEdge,
 	    },
 	    physics: 
 		{
@@ -148,10 +176,6 @@ function UpdateSelectedNode()
 {
 	if(gl.selectedNode != null)
 	{
-		// nodeInfoBoxes[nodeInfoBoxesIndex.Name].value = gl.selectedNode.label;
-		// nodeInfoBoxes[nodeInfoBoxesIndex.ID].value = gl.selectedNode.id;
-		// nodeInfoBoxes[nodeInfoBoxesIndex.File].value = gl.selectedNode.title;
-		// nodeInfoBoxes[nodeInfoBoxesIndex.Level].value = gl.selectedNode.level;
 		var temp = gl.selectedNode.level;
 		if(gl.nodesDataset == null)
 			gl.nodesDataset = gl.network.body.data.nodes;

@@ -21,7 +21,30 @@ Globals = function()
 		File: 2,
 		Level: 3
 	};
-	this.options = null;
+	this.options =
+	{
+	    layout: 
+		{
+	        hierarchical: 
+			{
+	            direction: "UD",
+	            sortMethod: "directed",
+	            nodeSpacing: 250
+	        }
+	    },
+	    interaction: 
+		{
+	        dragNodes: true
+	    },
+	    manipulation: 
+		{
+	        enabled: true,
+	    },
+	    physics: 
+		{
+	        enabled: false
+	    }
+	};
 
 	this.selectedNode = null;
 };
