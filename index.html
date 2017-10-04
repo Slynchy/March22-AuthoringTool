@@ -10,12 +10,12 @@
    
 </head>
 
-<body onload="draw();">
+<body id="body" onload="draw();">
 <h2>March22-AuthoringTool</h2>
-<input id="fileItem" type="file" onchange="HandleFiles()" value="Select Script Files" multiple>
+<input id="fileItem" type="button" onclick="ModalManager.createModal()" value="Load">
+<input id="fileItemSave" type="button" onclick="SaveProject()" title="Select Script Files" value="Save">
 <br>
-<input id="compileButton" type="button" onclick="SaveScripts()" value="Compile script files" multiple>
-<br><br>
+<input id="compileButton" type="button" onclick="SaveScripts()" value="Compile script files">
 
 <div id="mynetwork"></div>
 
@@ -43,6 +43,7 @@
 		Functionality: "js/March22/Functionality.js",
 		M22Compiler: "js/March22/M22Compiler.js",
 		M22vis: "js/March22/M22vis.js",
+		Modal: "js/March22/Modal.js",
 		main: "main.js"
 	};
 
@@ -54,8 +55,10 @@
 						Loader.load('js/March22/Functionality.js', function() {
 							Loader.load('js/March22/M22Compiler.js', function() {
 								Loader.load('js/March22/M22vis.js', function() {
-									Loader.load('main.js', function() {
-										console.log("Initializing main.js...");
+									Loader.load('js/March22/Modal.js', function() {
+										Loader.load('main.js', function() {
+											console.log("Initializing main.js...");
+										});
 									});
 								});
 							});
