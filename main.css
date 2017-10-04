@@ -47,9 +47,11 @@ label {
 }
 
 .bannerimg {
-    position: re
+    position: absolute;
     right: 0%;
     top: 0%;
-    width: 2%;
-    height: 2%;
+    width: 24%;
+    max-height:142px;
+    height: auto;
+}
 }
