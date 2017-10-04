@@ -12,13 +12,44 @@ function CompileNode(_scriptStr, _scriptStrPos, result)
 
 function HandleFiles()
 {
-	gl.nodes = [];
-	gl.edges = [];
+	var file = "";
 	for(i = 0; i < gl.scriptFileInput.files.length; i++)
 	{
-		ReadFileAsText(gl.scriptFileInput.files[i]);
+		file = (gl.scriptFileInput.files[i]);
 	}
-	gl.filesLoaded = true;
+	var reader = new FileReader();
+	reader.onload = function(e) {
+		var hashedName = file.name.hashCode();
+		var temp = JSON.parse(e.target.result);
+		gl.nodesDataset = new vis.DataSet(temp.nodes);
+		gl.edgesDataset = new vis.DataSet(temp.edges);
+		draw();
+	};
+	reader.readAsText(file, "UTF-8");
+}
+
+function SaveProject()
+{
+	var output = 
+	{
+		"nodes": [],
+		"edges": []
+	};
+	
+	var nodeIds = gl.nodesDataset.getIds();
+	for(i = 0; i < nodeIds.length; i++)
+	{
+		output["nodes"].push(gl.nodesDataset._data[nodeIds[i]]);
+	}
+
+	var edgeIds = gl.edgesDataset.getIds();
+	for(i = 0; i < edgeIds.length; i++)
+	{
+		output["edges"].push(gl.edgesDataset._data[edgeIds[i]]);
+	}
+
+	var blob = new Blob([JSON.stringify(output)], {type: "text/plain;charset=utf-8"});
+	saveAs(blob, "test.m22proj");
 }
 
 async function SaveScripts_Async()
@@ -27,8 +58,7 @@ async function SaveScripts_Async()
 	var numOfFiles = 0;
 	var files = [];
 	var nodeIds = gl.nodesDataset.getIds();
-	var length = nodeIds.length;
-	for(i = 0; i < length; i++)
+	for(i = 0; i < nodeIds.length; i++)
 	{
 		var fnameFound = -1;
 		for(f = 0; f < files.length; f++)
