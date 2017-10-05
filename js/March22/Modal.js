@@ -3,8 +3,9 @@ ModalManager = function()
 
 }
 
-ModalManager.createModal = function(content)
+ModalManager.createModal = function(content,callback)
 {
+    if(!callback) callback = function(){};
     var html = "";
     if(!content)
         html = '<div id="myModal" class="modal"> <!-- Modal content --> <div class="modal-content"> <span class="close">&times;</span> </div> </div>';
@@ -20,8 +21,10 @@ ModalManager.createModal = function(content)
 
 
     span.onclick = function() {
-        modal.style.display = "none";
+        //modal.style.display = "none";
+        callback();
+        modal.parentNode.removeChild(modal);
     }
 }
 
-window.addEventListener("keypress", ModalManager.createModal);
+//window.addEventListener("keypress", ModalManager.createModal);
