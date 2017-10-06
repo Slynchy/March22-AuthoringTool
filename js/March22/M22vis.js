@@ -34,6 +34,16 @@ Node.onSelectedFunctionChange = function()
 	}
 }
 
+onEditNode = function(nodeData, callback)
+{
+	callback(nodeData);
+}
+
+onEditEdge = function(edgeData, callback)
+{
+	callback(edgeData);
+}
+
 onAddNode = function(nodeData, callback)
 {
 	var list = '';
@@ -94,7 +104,7 @@ onAddNode = function(nodeData, callback)
 					nodeData.m22metadata.backName + " " + 
 					nodeData.m22metadata.transName + " " + 
 					( nodeData.m22metadata.inOrOut ? "true" : "" ) + " " +
-					nodeData.m22metadata.speed
+					( Number.parseFloat(nodeData.m22metadata.speed) !== 1.00 ? nodeData.m22metadata.speed : "")
 				);
 			break;
 			case Node.NodeTypes.nullop:
@@ -191,6 +201,12 @@ function draw()
 
 	// create a network
 	var container = document.getElementById('mynetwork');
+	gl.events.onAddEdge = onAddEdge;
+	gl.events.onAddNode = onAddNode;
+	gl.events.onDeleteEdge = onDeleteEdge;
+	gl.events.onDeleteNode = onDeleteNode;
+	gl.events.onEditEdge = onEditEdge;
+	gl.events.onEditNode = onEditNode;
 	gl.options = 
 	{
 	    layout: 
@@ -204,15 +220,18 @@ function draw()
 	    },
 	    interaction: 
 		{
-	        dragNodes: true
+			dragNodes: true,
+			navigationButtons: true,
 	    },
 	    manipulation: 
 		{
 	        enabled: true,
-			addNode: onAddNode,
-			deleteNode: onDeleteNode,
-			deleteEdge: onDeleteEdge,
-			addEdge: onAddEdge,
+			addNode: gl.events.onAddNode,
+			deleteNode: gl.events.onDeleteNode,
+			deleteEdge: gl.events.onDeleteEdge,
+			addEdge: gl.events.onAddEdge,
+			editEdge: gl.events.onEditEdge,
+			editNode: gl.events.onEditNode,
 	    },
 	    physics: 
 		{

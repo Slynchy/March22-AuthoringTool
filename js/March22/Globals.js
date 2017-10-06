@@ -1,5 +1,6 @@
 Globals = function()
 {
+
 	this.aceEditor = ace.edit("textbox");
 	this.aceEditor.$blockScrolling = Infinity;
 
@@ -14,6 +15,15 @@ Globals = function()
 	this.selectedNode = null;
 	this.nodesDataset = new vis.DataSet();
 	this.edgesDataset = new vis.DataSet();
+
+	this.events = {
+		onAddNode: null,
+		onDeleteNode: null,
+		onDeleteEdge: null,
+		onAddEdge: null,
+		onEditNode: null,
+		onEditEdge: null
+	};
 	
 	this.nodeInfoBoxesIndex = {
 		Name: 0,
@@ -21,32 +31,26 @@ Globals = function()
 		File: 2,
 		Level: 3
 	};
-	this.options =
-	{
-	    layout: 
-		{
-	        hierarchical: 
-			{
-	            direction: "UD",
-	            sortMethod: "directed",
-	            nodeSpacing: 250
-	        }
-	    },
-	    interaction: 
-		{
-	        dragNodes: true
-	    },
-	    manipulation: 
-		{
-	        enabled: true,
-	    },
-	    physics: 
-		{
-	        enabled: false
-	    }
-	};
 
 	this.selectedNode = null;
+
+	/*
+		VisJS Network options
+		Defined in M22vis, under draw()
+	*/
+	this.options = 
+	{
+		manipulation: // just so VisJS stops complaining
+		{
+			enabled: true,
+			addNode: this.events.onAddNode,
+			deleteNode: this.events.onDeleteNode,
+			deleteEdge: this.events.onDeleteEdge,
+			addEdge: this.events.onAddEdge,
+			editEdge: this.events.onEditEdge,
+			editNode: this.events.onEditNode,
+		}
+	}
 };
 
 var gl = new Globals();
