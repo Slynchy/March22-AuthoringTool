@@ -1,6 +1,7 @@
-ModalManager = function()
-{
 
+ModalManager = 
+{
+    activeModals : []
 }
 
 ModalManager.createModal = function(content,callback)
@@ -26,5 +27,3 @@ ModalManager.createModal = function(content,callback)
         modal.parentNode.removeChild(modal);
     }
 }
-
-//window.addEventListener("keypress", ModalManager.createModal);

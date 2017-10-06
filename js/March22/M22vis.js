@@ -44,6 +44,18 @@ onEditEdge = function(edgeData, callback)
 	callback(edgeData);
 }
 
+Node._createNodeModal = function(nodeData, callback)
+{
+	var list = '';
+	for (var key in Node.NodeTypes) {
+		if (Node.NodeTypes.hasOwnProperty(key)) {
+			var element = Node.NodeTypes[key];
+			list += '<option value="'+ key +'">'+ element +'</option>';
+		}
+	}
+	ModalManager.createModal('<center><select id="nodeFunctionSelect" onchange="Node.onSelectedFunctionChange()">'+ list +'</select><br><div id="additionalContent"></div<</center>');
+}
+
 onAddNode = function(nodeData, callback)
 {
 	var list = '';
@@ -54,7 +66,8 @@ onAddNode = function(nodeData, callback)
 		}
 	}
 
-	ModalManager.createModal('<center><select id="nodeFunctionSelect" onchange="Node.onSelectedFunctionChange()">'+ list +'</select><br><div id="additionalContent"></div<</center>', function(){
+	ModalManager.createModal('<center><select id="nodeFunctionSelect" onchange="Node.onSelectedFunctionChange()">'+ list +'</select><br><div id="additionalContent"></div<</center>', 
+	function(){
 		var e = document.getElementById("nodeFunctionSelect");
 		var selectedFunction = e.options[e.selectedIndex].text;
 
@@ -117,6 +130,9 @@ onAddNode = function(nodeData, callback)
 
 		if(selectedFunction !== Node.NodeTypes.nullop)
 			callback(nodeData);
+	},
+	function(_modal) {
+		ModalManager.activeModals.push(_modal);	
 	});
 }
 
