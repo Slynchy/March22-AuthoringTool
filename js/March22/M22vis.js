@@ -36,7 +36,28 @@ Node.onSelectedFunctionChange = function()
 
 onEditNode = function(nodeData, callback)
 {
-	callback(nodeData);
+	Node._createNodeModal(function()
+	{
+		Node._editNodeData(nodeData,callback);
+		gl.aceEditor.setValue(nodeData.SCRIPT_TXT);
+	},
+	function()
+	{
+		var e = document.getElementById("nodeFunctionSelect");
+		var i = 0;
+		for (var key in Node.NodeTypes) {
+			if (Node.NodeTypes.hasOwnProperty(key)) {
+				var element = Node.NodeTypes[key];
+				if(element === nodeData.nodeType)
+				{
+					e.selectedIndex = i;
+					break;
+				}
+				else i++;
+			}
+		}
+		Node.onSelectedFunctionChange();
+	});
 }
 
 onEditEdge = function(edgeData, callback)
@@ -44,7 +65,7 @@ onEditEdge = function(edgeData, callback)
 	callback(edgeData);
 }
 
-Node._createNodeModal = function(nodeData, callback)
+Node._createNodeModal = function(callback,createCallback)
 {
 	var list = '';
 	for (var key in Node.NodeTypes) {
@@ -53,87 +74,83 @@ Node._createNodeModal = function(nodeData, callback)
 			list += '<option value="'+ key +'">'+ element +'</option>';
 		}
 	}
-	ModalManager.createModal('<center><select id="nodeFunctionSelect" onchange="Node.onSelectedFunctionChange()">'+ list +'</select><br><div id="additionalContent"></div<</center>');
+	ModalManager.createModal('<center><select id="nodeFunctionSelect" selectedIndex=0 onchange="Node.onSelectedFunctionChange()">'+ list +'</select><br><div id="additionalContent"></div<</center>',callback,createCallback);
+}
+
+Node._editNodeData = function(nodeData,callback)
+{
+	var e = document.getElementById("nodeFunctionSelect");
+	var selectedFunction = e.options[e.selectedIndex].text;
+
+	switch(selectedFunction)
+	{
+		case Node.NodeTypes.narrative:
+			nodeData.label = 'NewNode';
+			nodeData.SCRIPT_TXT = document.getElementById("nNarrative").value;
+			nodeData.startOfNode = '';
+			nodeData.endOfNode = '';
+			nodeData.shape = 'ellipsis';
+			nodeData.color = { background: '#D2E5FF'};
+			nodeData.level = 0;
+		break;
+		case Node.NodeTypes.drawcharacter:
+			nodeData.m22metadata = {
+				charName: document.getElementById("nCharName").value,
+				emoName: document.getElementById("nEmoName").value,
+				xOffset: document.getElementById("nXOffset").value,
+				skipToNextLine: document.getElementById("nLineSkip").checked
+			};
+			nodeData.label = 'DrawCharacter';
+			nodeData.startOfNode = '';
+			nodeData.endOfNode = '';
+			nodeData.level = 0;
+			nodeData.shape = 'diamond';
+			nodeData.color = { background: '#BB1010'};
+			nodeData.SCRIPT_TXT = 'DrawCharacter ' + (
+				nodeData.m22metadata.charName + " " + 
+				nodeData.m22metadata.emoName + " " + 
+				nodeData.m22metadata.xOffset + " " +
+				( nodeData.m22metadata.skipToNextLine ? "true" : "" )
+			);
+		break;
+		case Node.NodeTypes.transition:
+			nodeData.m22metadata = {
+				backName: document.getElementById("nBackName").value,
+				transName: document.getElementById("nTransName").value,
+				speed: document.getElementById("nSpeed").value,
+				inOrOut: document.getElementById("nInOrOut").checked
+			};
+			nodeData.label = 'Transition';
+			nodeData.startOfNode = '';
+			nodeData.endOfNode = '';
+			nodeData.level = 0;
+			nodeData.shape = 'diamond';
+			nodeData.color = { background: '#BB1010'};
+			nodeData.SCRIPT_TXT = 'Transition ' + (
+				nodeData.m22metadata.backName + " " + 
+				nodeData.m22metadata.transName + " " + 
+				( nodeData.m22metadata.inOrOut ? "true" : "" ) + " " +
+				( Number.parseFloat(nodeData.m22metadata.speed) !== 1.00 ? nodeData.m22metadata.speed : "")
+			);
+		break;
+		case Node.NodeTypes.nullop:
+		default:
+			nodeData = null;
+		break;
+	}
+
+	if(nodeData)
+	{
+		nodeData.shadow = { enabled: false };
+		nodeData.nodeType = selectedFunction;
+	}
+
+	callback(nodeData);
 }
 
 onAddNode = function(nodeData, callback)
 {
-	var list = '';
-	for (var key in Node.NodeTypes) {
-		if (Node.NodeTypes.hasOwnProperty(key)) {
-			var element = Node.NodeTypes[key];
-			list += '<option value="'+ key +'">'+ element +'</option>';
-		}
-	}
-
-	ModalManager.createModal('<center><select id="nodeFunctionSelect" onchange="Node.onSelectedFunctionChange()">'+ list +'</select><br><div id="additionalContent"></div<</center>', 
-	function(){
-		var e = document.getElementById("nodeFunctionSelect");
-		var selectedFunction = e.options[e.selectedIndex].text;
-
-		switch(selectedFunction)
-		{
-			case Node.NodeTypes.narrative:
-				nodeData.label = 'NewNode';
-				nodeData.SCRIPT_TXT = document.getElementById("nNarrative").value;
-				nodeData.startOfNode = '';
-				nodeData.endOfNode = '';
-				nodeData.level = 0;
-			break;
-			case Node.NodeTypes.drawcharacter:
-				nodeData.m22metadata = {
-					charName: document.getElementById("nCharName").value,
-					emoName: document.getElementById("nEmoName").value,
-					xOffset: document.getElementById("nXOffset").value,
-					skipToNextLine: document.getElementById("nLineSkip").checked
-				};
-				nodeData.label = 'DrawCharacter';
-				nodeData.startOfNode = '';
-				nodeData.endOfNode = '';
-				nodeData.level = 0;
-				nodeData.shape = 'diamond';
-				nodeData.color = { background: '#BB1010'};
-				nodeData.SCRIPT_TXT = 'DrawCharacter ' + (
-					nodeData.m22metadata.charName + " " + 
-					nodeData.m22metadata.emoName + " " + 
-					nodeData.m22metadata.xOffset + " " +
-					( nodeData.m22metadata.skipToNextLine ? "true" : "" )
-				);
-			break;
-			case Node.NodeTypes.transition:
-				nodeData.m22metadata = {
-					backName: document.getElementById("nBackName").value,
-					transName: document.getElementById("nTransName").value,
-					speed: document.getElementById("nSpeed").value,
-					inOrOut: document.getElementById("nInOrOut").checked
-				};
-				nodeData.label = 'Transition';
-				nodeData.startOfNode = '';
-				nodeData.endOfNode = '';
-				nodeData.level = 0;
-				nodeData.shape = 'diamond';
-				nodeData.color = { background: '#BB1010'};
-				nodeData.SCRIPT_TXT = 'Transition ' + (
-					nodeData.m22metadata.backName + " " + 
-					nodeData.m22metadata.transName + " " + 
-					( nodeData.m22metadata.inOrOut ? "true" : "" ) + " " +
-					( Number.parseFloat(nodeData.m22metadata.speed) !== 1.00 ? nodeData.m22metadata.speed : "")
-				);
-			break;
-			case Node.NodeTypes.nullop:
-			break;
-			default:
-			break;
-		}
-
-		nodeData.nodeType = selectedFunction;
-
-		if(selectedFunction !== Node.NodeTypes.nullop)
-			callback(nodeData);
-	},
-	function(_modal) {
-		ModalManager.activeModals.push(_modal);	
-	});
+	Node._createNodeModal(function(){Node._editNodeData(nodeData,callback)});
 }
 
 onDeleteNode = function(nodeData,callback)
@@ -246,7 +263,7 @@ function draw()
 			deleteNode: gl.events.onDeleteNode,
 			deleteEdge: gl.events.onDeleteEdge,
 			addEdge: gl.events.onAddEdge,
-			editEdge: gl.events.onEditEdge,
+			editEdge: false,
 			editNode: gl.events.onEditNode,
 	    },
 	    physics: 
