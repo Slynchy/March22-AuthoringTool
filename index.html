@@ -14,7 +14,7 @@
 	<h2>March22-AuthoringTool</h2>
 	<input id="fileItem" type="button" onclick="CreateLoadMenu()" value="Load">
 	<input id="fileItemSave" type="button" onclick="SaveProject()" title="Select Script Files" value="Save">
-	<label>Hide functions? </label><input type="checkbox" id="settHideFunctions">
+	<label>Hide functions? </label><input type="checkbox" id="settHideFunctions" onchange="HideFunctionNodes()" style="vertical-align:middle;"></input>
 	<br>
 	<input id="compileButton" type="button" onclick="SaveScripts()" value="Compile script files">
 

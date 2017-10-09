@@ -10,6 +10,70 @@ function CompileNode(_scriptStr, _scriptStrPos, result)
     // returns the new script str pos
 }
 
+function HideFunctionNodes()
+{
+	var hideNodes = document.getElementById("settHideFunctions").checked;
+
+	if(hideNodes)
+	{
+		// iterate through ALL nodes, stash the function nodes and edges, remove them and re-draw
+		gl._STASHED_DATA = JSON.stringify(SaveNodesAndEdges())
+
+		for (var key in gl.nodesDataset._data) {
+			if (gl.nodesDataset._data.hasOwnProperty(key)) {
+				var node = gl.nodesDataset._data[key];
+				if(node.nodeType !== Node.NodeTypes.narrative)
+				{
+					var edgesToNode = [];
+					var edgesFromNode = [];
+					for (var eKey in gl.edgesDataset._data) {
+						if (gl.edgesDataset._data.hasOwnProperty(eKey)) {
+							var edge = gl.edgesDataset._data[eKey];
+							if(edge.from === node.id)
+							{
+								edgesFromNode.push(edge);
+							}
+							else if( edge.to === node.id)
+							{
+								edgesToNode.push(edge);
+							}
+							else continue;
+						}
+					}
+
+					if(edgesFromNode.length != 1)
+					{
+						// crap. This shouldn't happen.
+						continue;
+					}
+
+					for (var i = 0; i < edgesToNode.length; i++) {
+						var edge = edgesToNode[i];
+						gl.edgesDataset._data[edge.id].to = edgesFromNode[0].to;
+					}
+
+					delete gl.nodesDataset._data[key];
+				} else continue;
+				delete gl.edgesDataset._data[edgesFromNode[0].id];
+			}
+		}
+
+		draw();
+	}
+	else
+	{
+		// restore stashed nodes
+		if(!gl._STASHED_DATA)
+		{
+			// this should never happen
+			return;
+		}
+		LoadProject(gl._STASHED_DATA);
+
+		gl._STASHED_DATA = null;
+	}
+}
+
 function CreateLoadMenu()
 {
 	ModalManager.createModal('<input id="projectLoadButton" type="file" onchange="HandleFiles();" title="Select Script Files">');
@@ -26,15 +90,20 @@ function HandleFiles()
 	var reader = new FileReader();
 	reader.onload = function(e) {
 		var hashedName = file.name.hashCode();
-		var temp = JSON.parse(e.target.result);
-		gl.nodesDataset = new vis.DataSet(temp.nodes);
-		gl.edgesDataset = new vis.DataSet(temp.edges);
-		draw();
+		LoadProject(e.target.result);
 	};
 	reader.readAsText(file, "UTF-8");
 }
 
-function SaveProject()
+function LoadProject(jsonStr)
+{
+	var temp = JSON.parse(jsonStr);
+	gl.nodesDataset = new vis.DataSet(temp.nodes);
+	gl.edgesDataset = new vis.DataSet(temp.edges);
+	draw();
+}
+
+function SaveNodesAndEdges()
 {
 	var output = 
 	{
@@ -53,7 +122,12 @@ function SaveProject()
 	{
 		output["edges"].push(gl.edgesDataset._data[edgeIds[i]]);
 	}
+	return output;
+}
 
+function SaveProject()
+{
+	var output = SaveNodesAndEdges();
 	var blob = new Blob([JSON.stringify(output)], {type: "text/plain;charset=utf-8"});
 	saveAs(blob, "test.m22proj");
 }
