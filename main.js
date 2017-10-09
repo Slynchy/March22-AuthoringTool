@@ -10,12 +10,25 @@ function CompileNode(_scriptStr, _scriptStrPos, result)
     // returns the new script str pos
 }
 
+function ToggleButtons(onOrOff)
+{
+	document.getElementById("fileItem").disabled = !onOrOff;
+	document.getElementById("fileItemSave").disabled = !onOrOff;
+	document.getElementById("compileButton").disabled = !onOrOff;
+	for (var index = 0; index < gl.nodeInfoBoxes.length; index++) {
+		var element = gl.nodeInfoBoxes[index];
+		if(element)
+			element.disabled = !onOrOff;
+	}
+}
+
 function HideFunctionNodes()
 {
 	var hideNodes = document.getElementById("settHideFunctions").checked;
 
 	if(hideNodes)
 	{
+		ToggleButtons(false);
 		// iterate through ALL nodes, stash the function nodes and edges, remove them and re-draw
 		gl._STASHED_DATA = JSON.stringify(SaveNodesAndEdges())
 
@@ -43,7 +56,7 @@ function HideFunctionNodes()
 
 					if(edgesFromNode.length != 1)
 					{
-						// crap. This shouldn't happen.
+						// We exclude these nodes because they are important :)
 						continue;
 					}
 
@@ -62,6 +75,7 @@ function HideFunctionNodes()
 	}
 	else
 	{
+		ToggleButtons(true);
 		// restore stashed nodes
 		if(!gl._STASHED_DATA)
 		{
