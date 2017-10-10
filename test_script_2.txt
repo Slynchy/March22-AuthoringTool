@@ -1,3 +1,0 @@
-This is test script 2.
-
-This is a dead-end script. Nothing happens. Enjoy.
