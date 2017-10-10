@@ -11,23 +11,24 @@
 </head>
 
 <body id="body" onload="draw();">
-<h2>March22-AuthoringTool</h2>
-<input id="fileItem" type="button" onclick="CreateLoadMenu()" value="Load">
-<input id="fileItemSave" type="button" onclick="SaveProject()" title="Select Script Files" value="Save">
-<br>
-<input id="compileButton" type="button" onclick="SaveScripts()" value="Compile script files">
+	<h2>March22-AuthoringTool</h2>
+	<input id="fileItem" type="button" onclick="CreateLoadMenu()" value="Load">
+	<input id="fileItemSave" type="button" onclick="SaveProject()" title="Select Script Files" value="Save">
+	<label>Hide functions? </label><input type="checkbox" id="settHideFunctions" onchange="HideFunctionNodes()" style="vertical-align:middle;"></input>
+	<br>
+	<input id="compileButton" type="button" onclick="SaveScripts()" value="Compile script files">
 
-<div id="mynetwork"></div>
+	<div id="mynetwork"></div>
 
-<div id="nodeSettings">
-	<div class="nodeSetting"><label>Title: </label><input class="nodeItem" type="text" id="nName" oninput="UpdateSelectedNode()"></input></div>
-	<div class="nodeSetting"><label>Script file: </label><input class="nodeItem" type="text" id="nFile" oninput="UpdateSelectedNode()"></input></div>
-	<div class="nodeSetting"><label>Tree level: </label><input class="nodeItem" type="number" id="nLevel" onchange="UpdateSelectedNode()"></input></div>
-</div>
+	<div id="nodeSettings">
+		<div class="nodeSetting"><label>Title: </label><input class="nodeItem" type="text" id="nName" oninput="UpdateSelectedNode()"></input></div>
+		<div class="nodeSetting"><label>Script file: </label><input class="nodeItem" type="text" id="nFile" oninput="UpdateSelectedNode()"></input></div>
+		<div class="nodeSetting"><label>Tree level: </label><input class="nodeItem" type="number" id="nLevel" onchange="UpdateSelectedNode()"></input></div>
+	</div>
 
-<div id="textbox">Load a script file or start adding nodes!</div>
+	<div id="textbox">Load a script file or start adding nodes!</div>
 
-<p id="selection"></p>
+	<p id="selection"></p>
 </body>
 
 <script type="text/javascript" src="js/JSLoader.js"></script>

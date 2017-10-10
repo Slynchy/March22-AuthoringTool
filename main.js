@@ -10,6 +10,113 @@ function CompileNode(_scriptStr, _scriptStrPos, result)
     // returns the new script str pos
 }
 
+function ToggleButtons(onOrOff)
+{
+	document.getElementById("fileItem").disabled = !onOrOff;
+	document.getElementById("fileItemSave").disabled = !onOrOff;
+	document.getElementById("compileButton").disabled = !onOrOff;
+	for (var index = 0; index < gl.nodeInfoBoxes.length; index++) {
+		var element = gl.nodeInfoBoxes[index];
+		if(element)
+			element.disabled = !onOrOff;
+	}
+}
+
+function HideFunctionNodes()
+{
+	var hideNodes = document.getElementById("settHideFunctions").checked;
+
+	if(hideNodes)
+	{
+		ToggleButtons(false);
+		// iterate through ALL nodes, stash the function nodes and edges, remove them and re-draw
+		gl._STASHED_DATA = JSON.stringify(SaveNodesAndEdges())
+
+		for (var key in gl.nodesDataset._data) {
+			if (gl.nodesDataset._data.hasOwnProperty(key)) {
+				var node = gl.nodesDataset._data[key];
+				if(node.nodeType !== Node.NodeTypes.narrative)
+				{
+					var edgesToNode = [];
+					var edgesFromNode = [];
+					for (var eKey in gl.edgesDataset._data) {
+						if (gl.edgesDataset._data.hasOwnProperty(eKey)) {
+							var edge = gl.edgesDataset._data[eKey];
+							if(edge.from === node.id)
+							{
+								edgesFromNode.push(edge);
+							}
+							else if( edge.to === node.id)
+							{
+								edgesToNode.push(edge);
+							}
+							else continue;
+						}
+					}
+
+					// We exclude these nodes because they are important :)
+					if(edgesFromNode.length != 1 || edgesToNode.length <= 0)
+					{
+						continue;
+					}
+
+					for (var i = 0; i < edgesToNode.length; i++) {
+						var edge = edgesToNode[i];
+						gl.edgesDataset._data[edge.id].to = edgesFromNode[0].to;
+					}
+
+					delete gl.nodesDataset._data[key];
+				} else continue;
+				delete gl.edgesDataset._data[edgesFromNode[0].id];
+			}
+		}
+
+		draw();
+	}
+	else
+	{
+		ToggleButtons(true);
+		// restore stashed nodes
+		if(!gl._STASHED_DATA)
+		{
+			// this should never happen
+			return;
+		}
+		
+		gl._STASHED_DATA = JSON.parse(gl._STASHED_DATA);
+		// edit stashed data with edited nodes
+		for (var i = 0; i < gl._STASHED_DATA["nodes"].length; i++) {
+			var stashedNode = gl._STASHED_DATA["nodes"][i];
+
+			for (var nKey in gl.nodesDataset._data) {
+				if (gl.nodesDataset._data.hasOwnProperty(nKey)) {
+					var realNode = gl.nodesDataset._data[nKey];
+					if(nKey === stashedNode.id)
+					{
+						SetNode(stashedNode,realNode);
+						//stashedNode.SCRIPT_TXT = realNode.SCRIPT_TXT;
+						break;
+					}
+				}
+			}
+		}
+		gl._STASHED_DATA = JSON.stringify(gl._STASHED_DATA);
+
+		LoadProject(gl._STASHED_DATA);
+
+		gl._STASHED_DATA = null;
+	}
+}
+
+function SetNode(node,props)
+{
+	for (var key in props) {
+		if (props.hasOwnProperty(key)) {
+			node[key] = props[key];
+		}
+	}
+}
+
 function CreateLoadMenu()
 {
 	ModalManager.createModal('<input id="projectLoadButton" type="file" onchange="HandleFiles();" title="Select Script Files">');
@@ -26,15 +133,20 @@ function HandleFiles()
 	var reader = new FileReader();
 	reader.onload = function(e) {
 		var hashedName = file.name.hashCode();
-		var temp = JSON.parse(e.target.result);
-		gl.nodesDataset = new vis.DataSet(temp.nodes);
-		gl.edgesDataset = new vis.DataSet(temp.edges);
-		draw();
+		LoadProject(e.target.result);
 	};
 	reader.readAsText(file, "UTF-8");
 }
 
-function SaveProject()
+function LoadProject(jsonStr)
+{
+	var temp = JSON.parse(jsonStr);
+	gl.nodesDataset = new vis.DataSet(temp.nodes);
+	gl.edgesDataset = new vis.DataSet(temp.edges);
+	draw();
+}
+
+function SaveNodesAndEdges()
 {
 	var output = 
 	{
@@ -53,7 +165,12 @@ function SaveProject()
 	{
 		output["edges"].push(gl.edgesDataset._data[edgeIds[i]]);
 	}
+	return output;
+}
 
+function SaveProject()
+{
+	var output = SaveNodesAndEdges();
 	var blob = new Blob([JSON.stringify(output)], {type: "text/plain;charset=utf-8"});
 	saveAs(blob, "test.m22proj");
 }

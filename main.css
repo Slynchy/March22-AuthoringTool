@@ -30,16 +30,17 @@ body {
     bottom: 50%;
 }
 
-label {
+.modal + label {
     width:50px;
     clear:left;
     text-align:right;
     padding-right:10px;
-}
-
-.nodeItem, label {
     float:left;
 }
+
+/* .nodeItem {
+
+} */
 
 .nodeSetting {
     /*margin-top: 15px;*/

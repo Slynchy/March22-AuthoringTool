@@ -10,6 +10,8 @@ Globals = function()
 	this.scriptFileInput = null;//document.getElementById("fileItem");
 	this.scriptFiles = [];
 	this.nodeInfoBoxes = [];
+
+	this._STASHED_DATA = {};
 	
 	this.filesLoaded = false;
 	this.selectedNode = null;
