@@ -54,9 +54,9 @@ function HideFunctionNodes()
 						}
 					}
 
-					if(edgesFromNode.length != 1)
+					// We exclude these nodes because they are important :)
+					if(edgesFromNode.length != 1 || edgesToNode.length <= 0)
 					{
-						// We exclude these nodes because they are important :)
 						continue;
 					}
 
@@ -82,9 +82,38 @@ function HideFunctionNodes()
 			// this should never happen
 			return;
 		}
+		
+		gl._STASHED_DATA = JSON.parse(gl._STASHED_DATA);
+		// edit stashed data with edited nodes
+		for (var i = 0; i < gl._STASHED_DATA["nodes"].length; i++) {
+			var stashedNode = gl._STASHED_DATA["nodes"][i];
+
+			for (var nKey in gl.nodesDataset._data) {
+				if (gl.nodesDataset._data.hasOwnProperty(nKey)) {
+					var realNode = gl.nodesDataset._data[nKey];
+					if(nKey === stashedNode.id)
+					{
+						SetNode(stashedNode,realNode);
+						//stashedNode.SCRIPT_TXT = realNode.SCRIPT_TXT;
+						break;
+					}
+				}
+			}
+		}
+		gl._STASHED_DATA = JSON.stringify(gl._STASHED_DATA);
+
 		LoadProject(gl._STASHED_DATA);
 
 		gl._STASHED_DATA = null;
+	}
+}
+
+function SetNode(node,props)
+{
+	for (var key in props) {
+		if (props.hasOwnProperty(key)) {
+			node[key] = props[key];
+		}
 	}
 }
 
