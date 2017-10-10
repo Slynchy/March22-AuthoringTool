@@ -41,6 +41,8 @@
 		HTML: "js/March22/HTML.js",
 		Functionality: "js/March22/Functionality.js",
 		M22Compiler: "js/March22/M22Compiler.js",
+		Node: "js/March22/Node.js",
+		NodeTypes: "js/March22/NodeTypes.js",
 		M22vis: "js/March22/M22vis.js",
 		Modal: "js/March22/Modal.js",
 		main: "main.js"
@@ -53,10 +55,14 @@
 					Loader.load('js/March22/HTML.js', function() {
 						Loader.load('js/March22/Functionality.js', function() {
 							Loader.load('js/March22/M22Compiler.js', function() {
-								Loader.load('js/March22/M22vis.js', function() {
-									Loader.load('js/March22/Modal.js', function() {
-										Loader.load('main.js', function() {
-											console.log("Initializing main.js...");
+								Loader.load('js/March22/Node.js', function() {
+									Loader.load('js/March22/NodeTypes.js', function() {
+										Loader.load('js/March22/M22vis.js', function() {
+											Loader.load('js/March22/Modal.js', function() {
+												Loader.load('main.js', function() {
+													console.log("Initializing main.js...");
+												});
+											});
 										});
 									});
 								});

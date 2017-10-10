@@ -1,37 +1,96 @@
-Node.NodeTypes = {
-	'nullop': '-',
-	'narrative': 'Narrative/text',
-	'drawcharacter': 'DrawCharacter',
-	'transition': 'Transition',
-};
+Node.FindNodeType = function(nodeText)
+{
+	for (var key in Node.NodeTypes) {
+		if (Node.NodeTypes.hasOwnProperty(key)) {
+			var element = Node.NodeTypes[key];
+			if(element.name === nodeText) 
+			{
+				return Node.NodeTypes[key];
+			}
+			else continue;
+		}
+	}
+}
 
 Node.onSelectedFunctionChange = function()
 {
 	var e = document.getElementById("nodeFunctionSelect");
 	var selectedFunction = e.options[e.selectedIndex].text;
+	selectedFunction = Node.FindNodeType(selectedFunction);
 	e = document.getElementById("additionalContent");
 	e.innerHTML = "";
 
-	switch(selectedFunction)
-	{
-		case Node.NodeTypes.narrative:
-			e.innerHTML += '<label>Text: </label><textarea rows="4" cols="50" class="nodeItem" type="text" id="nNarrative"></textarea>';
-		break;
-		case Node.NodeTypes.drawcharacter:
-			e.innerHTML += '<label>Character name: </label><input class="nodeItem" type="text" id="nCharName"></input><br>';
-			e.innerHTML += '<label>Emotion name: </label><input class="nodeItem" type="text" id="nEmoName"></input><br>';
-			e.innerHTML += '<label>X offset: </label><input class="nodeItem" type="number" id="nXOffset"></input><br>';
-			e.innerHTML += '<label>Skip to next line?: </label><input class="nodeItem" type="checkbox" id="nLineSkip"></input><br>';
-		break;
-		case Node.NodeTypes.transition:
-			e.innerHTML += '<label>Background name: </label><input class="nodeItem" type="text" id="nBackName"></input><br>';
-			e.innerHTML += '<label>Transition name: </label><input class="nodeItem" type="text" id="nTransName"></input><br>';
-			e.innerHTML += '<label>Speed: </label><input class="nodeItem" type="number" id="nSpeed" step="0.01" value="1.00"></input><br>';
-			e.innerHTML += '<label>In or out?: </label><input class="nodeItem" type="checkbox" id="nInOrOut"></input><br>';
-		break;
-		default:
-		break;
+	for (var i = 0; i < selectedFunction.params.length; i++) {
+		var element = selectedFunction.params[i];
+		e.innerHTML += '<label>'+ element.name +'</label><input class="nodeItem" type="'+ element.type +'" id="'+ element.name.hashCode() +'"></input><br>';		
 	}
+
+	// switch(selectedFunction)
+	// {
+	// 	case Node.NodeTypes.narrative:
+	// 		e.innerHTML += '<label>Text: </label><textarea rows="4" cols="50" class="nodeItem" type="text" id="nNarrative"></textarea>';
+	// 	break;
+	// 	case Node.NodeTypes.drawcharacter:
+	// 		e.innerHTML += '<label>Character name: </label><input class="nodeItem" type="text" id="nCharName"></input><br>';
+	// 		e.innerHTML += '<label>Emotion name: </label><input class="nodeItem" type="text" id="nEmoName"></input><br>';
+	// 		e.innerHTML += '<label>X offset: </label><input class="nodeItem" type="number" id="nXOffset"></input><br>';
+	// 		e.innerHTML += '<label>Skip to next line?: </label><input class="nodeItem" type="checkbox" id="nLineSkip"></input><br>';
+	// 	break;
+	// 	case Node.NodeTypes.newpage:
+	// 	break;
+	// 	case Node.NodeTypes.hidewindow:
+	// 	break;
+	// 	case Node.NodeTypes.showwindow:
+	// 	break;
+	// 	case Node.NodeTypes.goto:
+	// 	break;
+	// 	case Node.NodeTypes.wait:
+	// 	break;
+	// 	case Node.NodeTypes.enablenovel:
+	// 	break;
+	// 	case Node.NodeTypes.disablenovel:
+	// 	break;
+	// 	case Node.NodeTypes.loadscript:
+	// 	break;
+	// 	case Node.NodeTypes.makechoice:
+	// 	break;
+	// 	case Node.NodeTypes.m22if:
+	// 	break;
+	// 	case Node.NodeTypes.setflag:
+	// 	break;
+	// 	case Node.NodeTypes.playvideo:
+	// 	break;
+	// 	case Node.NodeTypes.drawbackground:
+	// 	break;
+	// 	case Node.NodeTypes.transition:
+	// 		e.innerHTML += '<label>Background name: </label><input class="nodeItem" type="text" id="nBackName"></input><br>';
+	// 		e.innerHTML += '<label>Transition name: </label><input class="nodeItem" type="text" id="nTransName"></input><br>';
+	// 		e.innerHTML += '<label>Speed: </label><input class="nodeItem" type="number" id="nSpeed" step="0.01" value="1.00"></input><br>';
+	// 		e.innerHTML += '<label>In or out?: </label><input class="nodeItem" type="checkbox" id="nInOrOut"></input><br>';
+	// 	break;
+	// 	case Node.NodeTypes.playmusic:
+	// 	break;
+	// 	case Node.NodeTypes.stopmusic:
+	// 	break;
+	// 	case Node.NodeTypes.playsting:
+	// 	break;
+	// 	case Node.NodeTypes.playloopedsting:
+	// 	break;
+	// 	case Node.NodeTypes.stoploopedsting:
+	// 	break;
+	// 	case Node.NodeTypes.clearcharacters:
+	// 	break;
+	// 	case Node.NodeTypes.clearcharacter:
+	// 	break;
+	// 	case Node.NodeTypes.setmovementspeed:
+	// 	break;
+	// 	case Node.NodeTypes.settextspeed:
+	// 	break;
+	// 	case Node.NodeTypes.setanimtype:
+	// 	break;
+	// 	default:
+	// 	break;
+	// }
 }
 
 onEditNode = function(nodeData, callback)
@@ -71,7 +130,7 @@ Node._createNodeModal = function(callback,createCallback)
 	for (var key in Node.NodeTypes) {
 		if (Node.NodeTypes.hasOwnProperty(key)) {
 			var element = Node.NodeTypes[key];
-			list += '<option value="'+ key +'">'+ element +'</option>';
+			list += '<option value="'+ key +'">'+ element.name +'</option>';
 		}
 	}
 	ModalManager.createModal('<center><select id="nodeFunctionSelect" selectedIndex=0 onchange="Node.onSelectedFunctionChange()">'+ list +'</select><br><div id="additionalContent"></div<</center>',callback,createCallback);
@@ -80,13 +139,13 @@ Node._createNodeModal = function(callback,createCallback)
 Node._editNodeData = function(nodeData,callback)
 {
 	var e = document.getElementById("nodeFunctionSelect");
-	var selectedFunction = e.options[e.selectedIndex].text;
+	var selectedFunction = Node.FindNodeType(e.options[e.selectedIndex].text);
 
 	switch(selectedFunction)
 	{
 		case Node.NodeTypes.narrative:
 			nodeData.label = 'NewNode';
-			nodeData.SCRIPT_TXT = document.getElementById("nNarrative").value;
+			nodeData.SCRIPT_TXT = document.getElementById(selectedFunction.params[0].name.hashCode()).value;
 			nodeData.startOfNode = '';
 			nodeData.endOfNode = '';
 			nodeData.shape = 'ellipsis';
