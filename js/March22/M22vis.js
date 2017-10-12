@@ -81,13 +81,20 @@ Node._editNodeData = function(nodeData,callback)
 
 	var inputs = document.getElementById('additionalContent').getElementsByTagName('input');
 	var labels = document.getElementById('additionalContent').getElementsByTagName('label');
-	
-	nodeData.m22metadata = {};
+
 	nodeData.SCRIPT_TXT = selectedFunctionKey;
 	nodeData.label = selectedFunctionKey;
+	nodeData.level = 0;
+	nodeData.startOfNode = '';
+	nodeData.endOfNode = '';
+	for (var k in selectedFunction.nodeProps) {
+		if (selectedFunction.nodeProps.hasOwnProperty(k)) {
+			nodeData[k] = selectedFunction.nodeProps[k];
+		}
+	}
+
+	nodeData.m22metadata = {};
 	for (var i = 0; i < labels.length; i++) {
-		nodeData.m22metadata[labels[i].innerHTML] = inputs[i].value;
-		nodeData.SCRIPT_TXT += " " + inputs[i].value;
 		switch(inputs[i].type)
 		{
 			case 'checkbox':
@@ -105,25 +112,7 @@ Node._editNodeData = function(nodeData,callback)
 	{
 		case Node.NodeTypes.narrative:
 			nodeData.label = 'NewNode';
-			nodeData.startOfNode = '';
-			nodeData.endOfNode = '';
-			nodeData.shape = 'ellipsis';
 			nodeData.color = { background: '#D2E5FF'};
-			nodeData.level = 0;
-		break;
-		case Node.NodeTypes.drawcharacter:
-			nodeData.startOfNode = '';
-			nodeData.endOfNode = '';
-			nodeData.level = 0;
-			nodeData.shape = 'diamond';
-			nodeData.color = { background: '#BB1010'};
-		break;
-		case Node.NodeTypes.transition:
-			nodeData.startOfNode = '';
-			nodeData.endOfNode = '';
-			nodeData.level = 0;
-			nodeData.shape = 'diamond';
-			nodeData.color = { background: '#BB1010'};
 		break;
 		case Node.NodeTypes.nullop:
 			nodeData = null;
