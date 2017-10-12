@@ -82,7 +82,10 @@ Node._editNodeData = function(nodeData,callback)
 	var inputs = document.getElementById('additionalContent').getElementsByTagName('input');
 	var labels = document.getElementById('additionalContent').getElementsByTagName('label');
 
-	nodeData.SCRIPT_TXT = selectedFunctionKey;
+	if(selectedFunctionKey !== 'narrative')
+		nodeData.SCRIPT_TXT = selectedFunctionKey;
+	else
+		nodeData.SCRIPT_TXT = "";
 	nodeData.label = selectedFunctionKey;
 	nodeData.level = 0;
 	nodeData.startOfNode = '';
@@ -107,6 +110,9 @@ Node._editNodeData = function(nodeData,callback)
 				break;
 		}
 	}
+
+	if(selectedFunctionKey === 'narrative')
+		nodeData.SCRIPT_TXT = nodeData.SCRIPT_TXT.substr(1);
 
 	switch(selectedFunction)
 	{
