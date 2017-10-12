@@ -23,11 +23,12 @@ Node.Parameter = function(name, type, additionalData)
 	return obj;
 }
 
-Node.Function = function(name, params)
+Node.Function = function(name, params, nodeProps)
 {
     var obj = {};
 	obj.name = ( typeof(name) !== undefined ? name : '' );
-	obj.params = ( typeof(type) !== undefined ? params : [] );
+    obj.params = ( typeof(type) !== undefined ? params : [] );
+    obj.nodeProps = ( typeof(nodeProps) !== undefined ? nodeProps : {} );
 	return obj;
 }
 

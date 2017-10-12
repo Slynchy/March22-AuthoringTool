@@ -1,11 +1,15 @@
-Node.FindNodeType = function(nodeText)
+Node.FindNodeType = function(nodeText,returnKey)
 {
+	if( typeof(returnKey) === "undefined") returnKey = false;
 	for (var key in Node.NodeTypes) {
 		if (Node.NodeTypes.hasOwnProperty(key)) {
 			var element = Node.NodeTypes[key];
 			if(element.name === nodeText) 
 			{
-				return Node.NodeTypes[key];
+				if(returnKey)
+					return key;
+				else
+					return Node.NodeTypes[key];
 			}
 			else continue;
 		}
@@ -73,12 +77,23 @@ Node._editNodeData = function(nodeData,callback)
 {
 	var e = document.getElementById("nodeFunctionSelect");
 	var selectedFunction = Node.FindNodeType(e.options[e.selectedIndex].text);
+	var selectedFunctionKey = Node.FindNodeType(e.options[e.selectedIndex].text, true)
+
+	var inputs = document.getElementById('additionalContent').getElementsByTagName('input');
+	var labels = document.getElementById('additionalContent').getElementsByTagName('label');
+	
+	nodeData.m22metadata = {};
+	nodeData.SCRIPT_TXT = selectedFunctionKey;
+	nodeData.label = selectedFunctionKey;
+	for (var i = 0; i < labels.length; i++) {
+		nodeData.m22metadata[labels[i].innerHTML] = inputs[i].value;
+		nodeData.SCRIPT_TXT += " " + inputs[i].value;
+	}
 
 	switch(selectedFunction)
 	{
 		case Node.NodeTypes.narrative:
 			nodeData.label = 'NewNode';
-			nodeData.SCRIPT_TXT = document.getElementById(selectedFunction.params[0].name.hashCode()).value;
 			nodeData.startOfNode = '';
 			nodeData.endOfNode = '';
 			nodeData.shape = 'ellipsis';
@@ -86,49 +101,23 @@ Node._editNodeData = function(nodeData,callback)
 			nodeData.level = 0;
 		break;
 		case Node.NodeTypes.drawcharacter:
-			nodeData.m22metadata = {
-				charName: document.getElementById(("nCharName").hashCode()).value,
-				emoName: document.getElementById(("nEmoName").hashCode()).value,
-				xOffset: document.getElementById(("nXOffset").hashCode()).value,
-				skipToNextLine: document.getElementById(("nLineSkip").hashCode()).checked
-			};
-			nodeData.label = 'DrawCharacter';
 			nodeData.startOfNode = '';
 			nodeData.endOfNode = '';
 			nodeData.level = 0;
 			nodeData.shape = 'diamond';
 			nodeData.color = { background: '#BB1010'};
-			nodeData.SCRIPT_TXT = 'DrawCharacter ' + (
-				nodeData.m22metadata.charName + " " + 
-				nodeData.m22metadata.emoName + " " + 
-				nodeData.m22metadata.xOffset + " " +
-				( nodeData.m22metadata.skipToNextLine ? "true" : "" )
-			);
 		break;
 		case Node.NodeTypes.transition:
-			nodeData.m22metadata = {
-				backName: document.getElementById(("nBackName").hashCode()).value,
-				transName: document.getElementById(("nTransName").hashCode()).value,
-				speed: document.getElementById(("nSpeed").hashCode()).value,
-				inOrOut: document.getElementById(("nInOrOut").hashCode()).checked
-			};
-			nodeData.label = 'Transition';
 			nodeData.startOfNode = '';
 			nodeData.endOfNode = '';
 			nodeData.level = 0;
 			nodeData.shape = 'diamond';
 			nodeData.color = { background: '#BB1010'};
-			nodeData.SCRIPT_TXT = 'Transition ' + (
-				nodeData.m22metadata.backName + " " + 
-				nodeData.m22metadata.transName + " " + 
-				( nodeData.m22metadata.inOrOut ? "true" : "" ) + " " +
-				( Number.parseFloat(nodeData.m22metadata.speed) !== 1.00 ? nodeData.m22metadata.speed : "")
-			);
 		break;
 		case Node.NodeTypes.nullop:
+			nodeData = null;
 		break;
 		default:
-			nodeData = null;
 		break;
 	}
 

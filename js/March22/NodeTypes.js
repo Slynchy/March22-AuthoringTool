@@ -7,54 +7,61 @@ Node.NodeTypes = {
 		'Narrative/text',
 		[Node.Parameter("Text: ", "text")]
 	),
-	'drawcharacter'		: Node.Function(
+	'DrawCharacter'		: Node.Function(
 		'Draw character',
 		[
             Node.Parameter("Character name: ", "text"),
             Node.Parameter("Emotion name: ", "text"),
             Node.Parameter("X offset: ", "number"),
             Node.Parameter("Skip to next line?: ", "checkbox"),
-        ]
+		],
+		{
+			startOfNode : '',
+			endOfNode : '',
+			level : 0,
+			shape : 'diamond',
+			color : { background: '#BB1010' }
+		}
 	),
-	'newpage'			: Node.Function(
+	'NewPage'			: Node.Function(
 		'New page',
 		[]
 	),
-	'hidewindow'		: Node.Function(
+	'HideWindow'		: Node.Function(
 		'Hide window',
 		[]
 	),
-	'showwindow'		: Node.Function(
+	'ShowWindow'		: Node.Function(
 		'Show window',
 		[]
 	),
-	'goto'				: Node.Function(
+	'Goto'				: Node.Function(
 		'Goto',
 		[
             Node.Parameter("Node name/ID: ", "text")
         ]
 	),
-	'wait'				: Node.Function(
+	'Wait'				: Node.Function(
 		'Wait',
 		[
             Node.Parameter("Milliseconds to wait: ", "number")
         ]
 	),
-	'enablenovel'		: Node.Function(
+	'EnableNovelMode'		: Node.Function(
 		'Enable novel mode',
 		[]
 	),
-	'disablenovel'		: Node.Function(
+	'DisableNovelMode'		: Node.Function(
 		'Disable novel mode',
 		[]
 	),
-	'loadscript'		: Node.Function(
+	'LoadScript'		: Node.Function(
 		'Load script file',
 		[
             Node.Parameter("Script name: ", "text")
         ]
 	),
-	'makechoice'		: Node.Function(
+	'MakeDecision'		: Node.Function(
 		'Make decision',
 		[
 			Node.Parameter("Choice 1: ", "text"),
@@ -68,19 +75,19 @@ Node.NodeTypes = {
 			Node.Parameter("Flag name: ", "text")
 		]
 	),
-	'setflag'			: Node.Function(
+	'SetFlag'			: Node.Function(
 		'Set flag',
 		[
             Node.Parameter("Flag to set to true: ", "text")
         ]
 	),
-	'playvideo'			: Node.Function(
+	'PlayVideo'			: Node.Function(
 		'Play video',
 		[
             Node.Parameter("Video to play: ", "text")
         ]
 	),
-	'drawbackground'	: Node.Function(
+	'DrawBackground'	: Node.Function(
 		'Draw background',
 		[
             Node.Parameter("Background name: ", "text"),
@@ -91,7 +98,7 @@ Node.NodeTypes = {
 			Node.Parameter("Skip to next line?: ", "checkbox")
 		]
 	),
-	'transition'		: Node.Function(
+	'Transition'		: Node.Function(
 		'Transition',
 		[
             Node.Parameter("Background name: ", "text"),
@@ -100,25 +107,25 @@ Node.NodeTypes = {
             Node.Parameter("In or out?: ", "checkbox")
         ]
 	),
-	'playmusic'			: Node.Function(
+	'PlayMusic'			: Node.Function(
 		'Play music',
 		[
 			Node.Parameter("Track to play: ", "text")
 		]
 	),
-	'stopmusic'			: Node.Function(
+	'StopMusic'			: Node.Function(
 		'Stop music',
 		[
 			Node.Parameter("Speed: ", "number")
 		]
 	),
-	'playsting'			: Node.Function(
+	'PlaySting'			: Node.Function(
 		'Play SFX',
 		[
 			Node.Parameter("SFX to play: ", "text")
 		]
 	),
-	'playloopedsting'	: Node.Function(
+	'PlayLoopedSting'	: Node.Function(
 		'Play looped SFX',
 		[
 			Node.Parameter("SFX to play: ", "text"),
@@ -126,37 +133,37 @@ Node.NodeTypes = {
 			Node.Parameter("Fade speed: ", "text")
 		]
 	),
-	'stoploopedsting'	: Node.Function(
+	'StopLoopedSting'	: Node.Function(
 		'Stop looped SFX',
 		[
 			Node.Parameter("SFX to stop: ", "text"),
 			Node.Parameter("Stop speed: ", "number")
 		]
 	),
-	'clearcharacters'	: Node.Function(
+	'ClearCharacters'	: Node.Function(
 		'Clear characters',
 		[]
 	),
-	'clearcharacter'	: Node.Function(
+	'ClearCharacter'	: Node.Function(
 		'Clear specific character',
 		[
 			Node.Parameter("Character name: ", "text"),
 			Node.Parameter("Skip to next line?: ", "checkbox")
 		]
 	),
-	'setmovementspeed'	: Node.Function(
+	'SetMovementSpeed'	: Node.Function(
 		'Set movement speed',
 		[
 			Node.Parameter("Speed: ", "number")
 		]
 	),
-	'settextspeed'		: Node.Function(
+	'SetTextSpeed'		: Node.Function(
 		'Set text speed',
 		[
 			Node.Parameter("Speed: ", "number")
 		]
 	),
-	'setanimtype'		: Node.Function(
+	'SetAnimType'		: Node.Function(
 		'Set animation type',
 		[
 			Node.Parameter("Text: ", "number")
