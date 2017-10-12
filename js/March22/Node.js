@@ -14,11 +14,12 @@ visNode.prototype.testFunc = function(something) {
 };
 
 // text, number, checkbox (string)
-Node.Parameter = function(name, type)
+Node.Parameter = function(name, type, additionalData)
 {
     var obj = {};
 	obj.type = ( typeof(type) !== undefined ? type : '' );
-	obj.name = ( typeof(name) !== undefined ? name : '' );
+    obj.name = ( typeof(name) !== undefined ? name : '' );
+    obj.additionalData = ( typeof(additionalData) !== undefined ? additionalData : [] );
 	return obj;
 }
 

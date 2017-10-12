@@ -24,73 +24,6 @@ Node.onSelectedFunctionChange = function()
 		var element = selectedFunction.params[i];
 		e.innerHTML += '<label>'+ element.name +'</label><input class="nodeItem" type="'+ element.type +'" id="'+ element.name.hashCode() +'"></input><br>';		
 	}
-
-	// switch(selectedFunction)
-	// {
-	// 	case Node.NodeTypes.narrative:
-	// 		e.innerHTML += '<label>Text: </label><textarea rows="4" cols="50" class="nodeItem" type="text" id="nNarrative"></textarea>';
-	// 	break;
-	// 	case Node.NodeTypes.drawcharacter:
-	// 		e.innerHTML += '<label>Character name: </label><input class="nodeItem" type="text" id="nCharName"></input><br>';
-	// 		e.innerHTML += '<label>Emotion name: </label><input class="nodeItem" type="text" id="nEmoName"></input><br>';
-	// 		e.innerHTML += '<label>X offset: </label><input class="nodeItem" type="number" id="nXOffset"></input><br>';
-	// 		e.innerHTML += '<label>Skip to next line?: </label><input class="nodeItem" type="checkbox" id="nLineSkip"></input><br>';
-	// 	break;
-	// 	case Node.NodeTypes.newpage:
-	// 	break;
-	// 	case Node.NodeTypes.hidewindow:
-	// 	break;
-	// 	case Node.NodeTypes.showwindow:
-	// 	break;
-	// 	case Node.NodeTypes.goto:
-	// 	break;
-	// 	case Node.NodeTypes.wait:
-	// 	break;
-	// 	case Node.NodeTypes.enablenovel:
-	// 	break;
-	// 	case Node.NodeTypes.disablenovel:
-	// 	break;
-	// 	case Node.NodeTypes.loadscript:
-	// 	break;
-	// 	case Node.NodeTypes.makechoice:
-	// 	break;
-	// 	case Node.NodeTypes.m22if:
-	// 	break;
-	// 	case Node.NodeTypes.setflag:
-	// 	break;
-	// 	case Node.NodeTypes.playvideo:
-	// 	break;
-	// 	case Node.NodeTypes.drawbackground:
-	// 	break;
-	// 	case Node.NodeTypes.transition:
-	// 		e.innerHTML += '<label>Background name: </label><input class="nodeItem" type="text" id="nBackName"></input><br>';
-	// 		e.innerHTML += '<label>Transition name: </label><input class="nodeItem" type="text" id="nTransName"></input><br>';
-	// 		e.innerHTML += '<label>Speed: </label><input class="nodeItem" type="number" id="nSpeed" step="0.01" value="1.00"></input><br>';
-	// 		e.innerHTML += '<label>In or out?: </label><input class="nodeItem" type="checkbox" id="nInOrOut"></input><br>';
-	// 	break;
-	// 	case Node.NodeTypes.playmusic:
-	// 	break;
-	// 	case Node.NodeTypes.stopmusic:
-	// 	break;
-	// 	case Node.NodeTypes.playsting:
-	// 	break;
-	// 	case Node.NodeTypes.playloopedsting:
-	// 	break;
-	// 	case Node.NodeTypes.stoploopedsting:
-	// 	break;
-	// 	case Node.NodeTypes.clearcharacters:
-	// 	break;
-	// 	case Node.NodeTypes.clearcharacter:
-	// 	break;
-	// 	case Node.NodeTypes.setmovementspeed:
-	// 	break;
-	// 	case Node.NodeTypes.settextspeed:
-	// 	break;
-	// 	case Node.NodeTypes.setanimtype:
-	// 	break;
-	// 	default:
-	// 	break;
-	// }
 }
 
 onEditNode = function(nodeData, callback)
@@ -107,7 +40,7 @@ onEditNode = function(nodeData, callback)
 		for (var key in Node.NodeTypes) {
 			if (Node.NodeTypes.hasOwnProperty(key)) {
 				var element = Node.NodeTypes[key];
-				if(element === nodeData.nodeType)
+				if(element.name === nodeData.nodeType.name)
 				{
 					e.selectedIndex = i;
 					break;
@@ -154,10 +87,10 @@ Node._editNodeData = function(nodeData,callback)
 		break;
 		case Node.NodeTypes.drawcharacter:
 			nodeData.m22metadata = {
-				charName: document.getElementById("nCharName").value,
-				emoName: document.getElementById("nEmoName").value,
-				xOffset: document.getElementById("nXOffset").value,
-				skipToNextLine: document.getElementById("nLineSkip").checked
+				charName: document.getElementById(("nCharName").hashCode()).value,
+				emoName: document.getElementById(("nEmoName").hashCode()).value,
+				xOffset: document.getElementById(("nXOffset").hashCode()).value,
+				skipToNextLine: document.getElementById(("nLineSkip").hashCode()).checked
 			};
 			nodeData.label = 'DrawCharacter';
 			nodeData.startOfNode = '';
@@ -174,10 +107,10 @@ Node._editNodeData = function(nodeData,callback)
 		break;
 		case Node.NodeTypes.transition:
 			nodeData.m22metadata = {
-				backName: document.getElementById("nBackName").value,
-				transName: document.getElementById("nTransName").value,
-				speed: document.getElementById("nSpeed").value,
-				inOrOut: document.getElementById("nInOrOut").checked
+				backName: document.getElementById(("nBackName").hashCode()).value,
+				transName: document.getElementById(("nTransName").hashCode()).value,
+				speed: document.getElementById(("nSpeed").hashCode()).value,
+				inOrOut: document.getElementById(("nInOrOut").hashCode()).checked
 			};
 			nodeData.label = 'Transition';
 			nodeData.startOfNode = '';
@@ -193,6 +126,7 @@ Node._editNodeData = function(nodeData,callback)
 			);
 		break;
 		case Node.NodeTypes.nullop:
+		break;
 		default:
 			nodeData = null;
 		break;
