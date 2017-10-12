@@ -88,6 +88,17 @@ Node._editNodeData = function(nodeData,callback)
 	for (var i = 0; i < labels.length; i++) {
 		nodeData.m22metadata[labels[i].innerHTML] = inputs[i].value;
 		nodeData.SCRIPT_TXT += " " + inputs[i].value;
+		switch(inputs[i].type)
+		{
+			case 'checkbox':
+				nodeData.m22metadata[labels[i].innerHTML] = inputs[i].checked;
+				nodeData.SCRIPT_TXT += " " + inputs[i].checked;
+				break;
+			default:
+				nodeData.m22metadata[labels[i].innerHTML] = inputs[i].value;
+				nodeData.SCRIPT_TXT += " " + inputs[i].value;
+				break;
+		}
 	}
 
 	switch(selectedFunction)
