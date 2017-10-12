@@ -1,36 +1,32 @@
-Node.NodeTypes = {
-	'nullop': '-',
-	'narrative': 'Narrative/text',
-	'drawcharacter': 'DrawCharacter',
-	'transition': 'Transition',
-};
+Node.FindNodeType = function(nodeText,returnKey)
+{
+	if( typeof(returnKey) === "undefined") returnKey = false;
+	for (var key in Node.NodeTypes) {
+		if (Node.NodeTypes.hasOwnProperty(key)) {
+			var element = Node.NodeTypes[key];
+			if(element.name === nodeText) 
+			{
+				if(returnKey)
+					return key;
+				else
+					return Node.NodeTypes[key];
+			}
+			else continue;
+		}
+	}
+}
 
 Node.onSelectedFunctionChange = function()
 {
 	var e = document.getElementById("nodeFunctionSelect");
 	var selectedFunction = e.options[e.selectedIndex].text;
+	selectedFunction = Node.FindNodeType(selectedFunction);
 	e = document.getElementById("additionalContent");
 	e.innerHTML = "";
 
-	switch(selectedFunction)
-	{
-		case Node.NodeTypes.narrative:
-			e.innerHTML += '<label>Text: </label><textarea rows="4" cols="50" class="nodeItem" type="text" id="nNarrative"></textarea>';
-		break;
-		case Node.NodeTypes.drawcharacter:
-			e.innerHTML += '<label>Character name: </label><input class="nodeItem" type="text" id="nCharName"></input><br>';
-			e.innerHTML += '<label>Emotion name: </label><input class="nodeItem" type="text" id="nEmoName"></input><br>';
-			e.innerHTML += '<label>X offset: </label><input class="nodeItem" type="number" id="nXOffset"></input><br>';
-			e.innerHTML += '<label>Skip to next line?: </label><input class="nodeItem" type="checkbox" id="nLineSkip"></input><br>';
-		break;
-		case Node.NodeTypes.transition:
-			e.innerHTML += '<label>Background name: </label><input class="nodeItem" type="text" id="nBackName"></input><br>';
-			e.innerHTML += '<label>Transition name: </label><input class="nodeItem" type="text" id="nTransName"></input><br>';
-			e.innerHTML += '<label>Speed: </label><input class="nodeItem" type="number" id="nSpeed" step="0.01" value="1.00"></input><br>';
-			e.innerHTML += '<label>In or out?: </label><input class="nodeItem" type="checkbox" id="nInOrOut"></input><br>';
-		break;
-		default:
-		break;
+	for (var i = 0; i < selectedFunction.params.length; i++) {
+		var element = selectedFunction.params[i];
+		e.innerHTML += '<label>'+ element.name +'</label><input class="nodeItem" type="'+ element.type +'" id="'+ element.name.hashCode() +'"></input><br>';		
 	}
 }
 
@@ -48,7 +44,7 @@ onEditNode = function(nodeData, callback)
 		for (var key in Node.NodeTypes) {
 			if (Node.NodeTypes.hasOwnProperty(key)) {
 				var element = Node.NodeTypes[key];
-				if(element === nodeData.nodeType)
+				if(element.name === nodeData.nodeType.name)
 				{
 					e.selectedIndex = i;
 					break;
@@ -71,7 +67,7 @@ Node._createNodeModal = function(callback,createCallback)
 	for (var key in Node.NodeTypes) {
 		if (Node.NodeTypes.hasOwnProperty(key)) {
 			var element = Node.NodeTypes[key];
-			list += '<option value="'+ key +'">'+ element +'</option>';
+			list += '<option value="'+ key +'">'+ element.name +'</option>';
 		}
 	}
 	ModalManager.createModal('<center><select id="nodeFunctionSelect" selectedIndex=0 onchange="Node.onSelectedFunctionChange()">'+ list +'</select><br><div id="additionalContent"></div<</center>',callback,createCallback);
@@ -80,62 +76,54 @@ Node._createNodeModal = function(callback,createCallback)
 Node._editNodeData = function(nodeData,callback)
 {
 	var e = document.getElementById("nodeFunctionSelect");
-	var selectedFunction = e.options[e.selectedIndex].text;
+	var selectedFunction = Node.FindNodeType(e.options[e.selectedIndex].text);
+	var selectedFunctionKey = Node.FindNodeType(e.options[e.selectedIndex].text, true)
+
+	var inputs = document.getElementById('additionalContent').getElementsByTagName('input');
+	var labels = document.getElementById('additionalContent').getElementsByTagName('label');
+
+	if(selectedFunctionKey !== 'narrative')
+		nodeData.SCRIPT_TXT = selectedFunctionKey;
+	else
+		nodeData.SCRIPT_TXT = "";
+	nodeData.label = selectedFunctionKey;
+	nodeData.level = 0;
+	nodeData.startOfNode = '';
+	nodeData.endOfNode = '';
+	for (var k in selectedFunction.nodeProps) {
+		if (selectedFunction.nodeProps.hasOwnProperty(k)) {
+			nodeData[k] = selectedFunction.nodeProps[k];
+		}
+	}
+
+	nodeData.m22metadata = {};
+	for (var i = 0; i < labels.length; i++) {
+		switch(inputs[i].type)
+		{
+			case 'checkbox':
+				nodeData.m22metadata[labels[i].innerHTML] = inputs[i].checked;
+				nodeData.SCRIPT_TXT += " " + inputs[i].checked;
+				break;
+			default:
+				nodeData.m22metadata[labels[i].innerHTML] = inputs[i].value;
+				nodeData.SCRIPT_TXT += " " + inputs[i].value;
+				break;
+		}
+	}
+
+	if(selectedFunctionKey === 'narrative')
+		nodeData.SCRIPT_TXT = nodeData.SCRIPT_TXT.substr(1);
 
 	switch(selectedFunction)
 	{
 		case Node.NodeTypes.narrative:
 			nodeData.label = 'NewNode';
-			nodeData.SCRIPT_TXT = document.getElementById("nNarrative").value;
-			nodeData.startOfNode = '';
-			nodeData.endOfNode = '';
-			nodeData.shape = 'ellipsis';
 			nodeData.color = { background: '#D2E5FF'};
-			nodeData.level = 0;
-		break;
-		case Node.NodeTypes.drawcharacter:
-			nodeData.m22metadata = {
-				charName: document.getElementById("nCharName").value,
-				emoName: document.getElementById("nEmoName").value,
-				xOffset: document.getElementById("nXOffset").value,
-				skipToNextLine: document.getElementById("nLineSkip").checked
-			};
-			nodeData.label = 'DrawCharacter';
-			nodeData.startOfNode = '';
-			nodeData.endOfNode = '';
-			nodeData.level = 0;
-			nodeData.shape = 'diamond';
-			nodeData.color = { background: '#BB1010'};
-			nodeData.SCRIPT_TXT = 'DrawCharacter ' + (
-				nodeData.m22metadata.charName + " " + 
-				nodeData.m22metadata.emoName + " " + 
-				nodeData.m22metadata.xOffset + " " +
-				( nodeData.m22metadata.skipToNextLine ? "true" : "" )
-			);
-		break;
-		case Node.NodeTypes.transition:
-			nodeData.m22metadata = {
-				backName: document.getElementById("nBackName").value,
-				transName: document.getElementById("nTransName").value,
-				speed: document.getElementById("nSpeed").value,
-				inOrOut: document.getElementById("nInOrOut").checked
-			};
-			nodeData.label = 'Transition';
-			nodeData.startOfNode = '';
-			nodeData.endOfNode = '';
-			nodeData.level = 0;
-			nodeData.shape = 'diamond';
-			nodeData.color = { background: '#BB1010'};
-			nodeData.SCRIPT_TXT = 'Transition ' + (
-				nodeData.m22metadata.backName + " " + 
-				nodeData.m22metadata.transName + " " + 
-				( nodeData.m22metadata.inOrOut ? "true" : "" ) + " " +
-				( Number.parseFloat(nodeData.m22metadata.speed) !== 1.00 ? nodeData.m22metadata.speed : "")
-			);
 		break;
 		case Node.NodeTypes.nullop:
-		default:
 			nodeData = null;
+		break;
+		default:
 		break;
 	}
 
