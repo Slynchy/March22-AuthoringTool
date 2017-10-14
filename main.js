@@ -181,32 +181,16 @@ async function SaveScripts_Async()
 	var numOfFiles = 0;
 	var files = [];
 	var nodeIds = gl.nodesDataset.getIds();
+
+	var tempFile = {
+		name: "OUTPUT.txt",
+		nodes: []
+	};
+	files.push(tempFile);
+
 	for(i = 0; i < nodeIds.length; i++)
 	{
-		var fnameFound = -1;
-		for(f = 0; f < files.length; f++)
-		{
-			if(files[f].name === gl.nodesDataset._data[nodeIds[i]].title)
-			{
-				fnameFound = f;
-				break;
-			}
-		}
-		if(fnameFound === -1)
-		{
-			numOfFiles++;
-			
-			var tempFile = {
-				name: gl.nodesDataset._data[nodeIds[i]].title,
-				nodes: []
-			};
-			tempFile.nodes.push(gl.nodesDataset._data[nodeIds[i]]);
-			files.push(tempFile);
-		}
-		else
-		{
-			files[fnameFound].nodes.push(gl.nodesDataset._data[nodeIds[i]]);
-		}
+		files[0].nodes.push(gl.nodesDataset._data[nodeIds[i]]);
 	}
 	
 	for(i = 0; i < files.length; i++)
