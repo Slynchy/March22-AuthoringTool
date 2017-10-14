@@ -1,5 +1,7 @@
 /*
     Todo file for March22-AuthoringTool
+
+    If a task is ticked but in the backlog, that means it's in dev/selected for dev
 */
 
 Backlog:
@@ -12,7 +14,6 @@ Backlog:
         ☐ Weird interaction when changing level of a node
     Features:
         ☐ Preview system
-        ✔ New nodes go to the highest level by default
         ☐ Settings button/modal
             ☐ Make VisJS styling configurable
         ☐ Generic loading modal to show when busy with async operations
@@ -22,4 +23,7 @@ Backlog:
             ☐ Make existing frontend utilize said JS file
 
 Completed:
+    Bugs:
 
+    Features:
+        ✔ New nodes go to the highest level by default

@@ -87,7 +87,7 @@ Node._editNodeData = function(nodeData,callback)
 	else
 		nodeData.SCRIPT_TXT = "";
 	nodeData.label = selectedFunctionKey;
-	nodeData.level = 0;
+	nodeData.level = !nodeData.level ? GetHighestNodeLevel() + 1 : nodeData.level;
 	nodeData.startOfNode = '';
 	nodeData.endOfNode = '';
 	for (var k in selectedFunction.nodeProps) {
@@ -310,6 +310,21 @@ function draw()
 			}
 		}
 	});
+}
+
+function GetHighestNodeLevel()
+{
+	var highest = false;
+	for (var key in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(key)) {
+			if(typeof(highest) === 'boolean' || gl.nodesDataset._data[key].level > highest)
+			{
+				highest = gl.nodesDataset._data[key].level;
+			}
+		}
+	}
+	if(highest === false) return 0;
+	else return highest;
 }
 
 function UpdateSelectedNode()
