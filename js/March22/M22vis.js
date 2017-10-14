@@ -124,7 +124,8 @@ Node._editNodeData = function(nodeData,callback)
 		{
 			case 'checkbox':
 				nodeData.m22metadata[labels[i].innerHTML] = inputs[i].checked;
-				nodeData.SCRIPT_TXT += " " + inputs[i].checked;
+				if(inputs[i].checked === true)
+					nodeData.SCRIPT_TXT += " " + inputs[i].checked;
 				break;
 			default:
 				nodeData.m22metadata[labels[i].innerHTML] = inputs[i].value;

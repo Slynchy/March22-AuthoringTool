@@ -7,7 +7,6 @@
 Backlog:
     Bugs:    
         ☐ Multiple single-destination function nodes cause entire tree to be hidden when hiding function nodes
-        ☐ Functions that end in a boolean have the boolean appended even if it is an optional parameter or breaks the function
     Features:
         ☐ Preview system
         ☐ Settings button/modal
@@ -20,11 +19,11 @@ Backlog:
 
 Completed:
     Bugs:
-        ✘ Weird interaction when changing level of a node
-            - Have made better, but can't really fix
+        ✘ Weird interaction when changing level of a node (have made better, but can't really fix)
         ✔ Opening the edit node modal wipes the existing parameters
         ✔ The 'Script File' option is now deprecated and needs to be removed
             ✔ Change mouse-over title of nodes from script filename to something else
+        ✔ Functions that end in a boolean have the boolean appended even if it is an optional parameter or breaks the function
 
     Features:
         ✔ New nodes go to the highest level by default
