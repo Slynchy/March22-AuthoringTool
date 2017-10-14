@@ -208,15 +208,8 @@ onAddEdge = function(edgeData,callback)
 	if(gl.nodesDataset === undefined)
 		gl.nodesDataset = gl.network.body.data.nodes;
 	
-	if(fromNode.title == toNode.title || toNode.title === undefined || fromNode.title === undefined)
-	{
-		fromNode.endOfNode = "\n\nGoto " + edgeData.to;
-		toNode.startOfNode = "--" + edgeData.to + "\n\n";
-	}
-	else
-	{
-		fromNode.endOfNode = "\n\nLoadScript " + toNode.title;
-	}
+	fromNode.endOfNode = "\n\nGoto " + edgeData.to;
+	toNode.startOfNode = "--" + edgeData.to + "\n\n";
 	
 	UpdateSelectedNode();
 	callback(edgeData);
@@ -305,9 +298,6 @@ function draw()
 				gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Name].value = gl.selectedNode.label;
 				if(gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.ID])
 					gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.ID].value = gl.selectedNode.id;
-				if(typeof(gl.selectedNode.title) === undefined || gl.selectedNode.title === undefined || gl.selectedNode.title == null)
-					gl.selectedNode.title = "NewScriptFile.txt";
-				gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.File].value = gl.selectedNode.title;
 				gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Level].value = gl.selectedNode.level;
 			}
 			catch(err)
