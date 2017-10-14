@@ -55,7 +55,7 @@ function HideFunctionNodes()
 					}
 
 					// We exclude these nodes because they are important :)
-					if(edgesFromNode.length != 1 || edgesToNode.length <= 0)
+					if(edgesFromNode.length != 1 || edgesToNode.length == 0)
 					{
 						continue;
 					}

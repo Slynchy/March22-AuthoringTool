@@ -87,7 +87,7 @@ Node._editNodeData = function(nodeData,callback)
 	else
 		nodeData.SCRIPT_TXT = "";
 	nodeData.label = selectedFunctionKey;
-	nodeData.level = 0;
+	nodeData.level = !nodeData.level ? GetHighestNodeLevel() + 1 : nodeData.level;
 	nodeData.startOfNode = '';
 	nodeData.endOfNode = '';
 	for (var k in selectedFunction.nodeProps) {
@@ -189,14 +189,11 @@ onAddEdge = function(edgeData,callback)
 	if(fromNode.title == toNode.title || toNode.title === undefined || fromNode.title === undefined)
 	{
 		fromNode.endOfNode = "\n\nGoto " + edgeData.to;
-		//fromNode.SCRIPT_TXT += "\n\nGoto " + edgeData.to;
 		toNode.startOfNode = "--" + edgeData.to + "\n\n";
-		//toNode.SCRIPT_TXT = "--" + edgeData.to + "\n\n" + toNode.SCRIPT_TXT;
 	}
 	else
 	{
-		//fromNode.SCRIPT_TXT += "\n\nLoadScript " + toNode.title;
-		romNode.endOfNode = "\n\nLoadScript " + toNode.title;
+		fromNode.endOfNode = "\n\nLoadScript " + toNode.title;
 	}
 	
 	UpdateSelectedNode();
@@ -313,6 +310,21 @@ function draw()
 			}
 		}
 	});
+}
+
+function GetHighestNodeLevel()
+{
+	var highest = false;
+	for (var key in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(key)) {
+			if(typeof(highest) === 'boolean' || gl.nodesDataset._data[key].level > highest)
+			{
+				highest = gl.nodesDataset._data[key].level;
+			}
+		}
+	}
+	if(highest === false) return 0;
+	else return highest;
 }
 
 function UpdateSelectedNode()
