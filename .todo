@@ -1,0 +1,23 @@
+/*
+    Todo file for March22-AuthoringTool
+*/
+
+Bugs:    
+    ☐ Multiple single-destination function nodes cause entire tree to be hidden when hiding function nodes
+    ☐ Opening the edit node modal wipes the existing parameters
+    ☐ Functions that end in a boolean have the boolean appended even if it is an optional parameter or breaks the function
+    ☐ The 'Script File' option is now deprecated and needs to be removed
+        ☐ Change mouse-over title of nodes from script filename to something else
+    ☐ Weird interaction when changing level of a node
+
+Features:
+    ☐ Preview system
+    ☐ New nodes go to the highest level by default
+    ☐ Settings button/modal
+        ☐ Make VisJS styling configurable
+        ☐ 
+    ☐ Generic loading modal to show when busy with async operations
+    ☐ Localisation
+        ☐ Unicode-friendly font
+        ☐ New JS file to house all strings and localisations
+        ☐ Make existing frontend utilize said JS file
