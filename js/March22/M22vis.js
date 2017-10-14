@@ -189,14 +189,11 @@ onAddEdge = function(edgeData,callback)
 	if(fromNode.title == toNode.title || toNode.title === undefined || fromNode.title === undefined)
 	{
 		fromNode.endOfNode = "\n\nGoto " + edgeData.to;
-		//fromNode.SCRIPT_TXT += "\n\nGoto " + edgeData.to;
 		toNode.startOfNode = "--" + edgeData.to + "\n\n";
-		//toNode.SCRIPT_TXT = "--" + edgeData.to + "\n\n" + toNode.SCRIPT_TXT;
 	}
 	else
 	{
-		//fromNode.SCRIPT_TXT += "\n\nLoadScript " + toNode.title;
-		romNode.endOfNode = "\n\nLoadScript " + toNode.title;
+		fromNode.endOfNode = "\n\nLoadScript " + toNode.title;
 	}
 	
 	UpdateSelectedNode();
