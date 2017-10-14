@@ -53,6 +53,7 @@ onEditNode = function(nodeData, callback)
 			}
 		}
 		Node.onSelectedFunctionChange();
+		Node._populateNodeModalParameters(nodeData);
 	});
 }
 
@@ -72,6 +73,27 @@ Node._createNodeModal = function(callback,createCallback)
 	}
 	ModalManager.createModal('<center><select id="nodeFunctionSelect" selectedIndex=0 onchange="Node.onSelectedFunctionChange()">'+ list +'</select><br><div id="additionalContent"></div<</center>',callback,createCallback);
 }
+
+Node._populateNodeModalParameters = function(nodeData)
+{
+	var inputs = document.getElementById('additionalContent').getElementsByTagName('input');
+	var labels = document.getElementById('additionalContent').getElementsByTagName('label');
+
+	for (var i = 0; i < labels.length; i++) {
+		var e = labels[i];
+		
+		switch(inputs[i].type)
+		{
+			case 'checkbox':
+				inputs[i].checked = nodeData.m22metadata[e.innerHTML];
+				break;
+			default:
+				inputs[i].value = nodeData.m22metadata[e.innerHTML];
+				break;
+		}
+	}
+}
+
 
 Node._editNodeData = function(nodeData,callback)
 {
