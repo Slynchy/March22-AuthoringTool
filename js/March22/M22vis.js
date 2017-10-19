@@ -94,6 +94,21 @@ Node._populateNodeModalParameters = function(nodeData)
 	}
 }
 
+Node.UpdateNodeChildren = function()
+{
+	for (var nKey in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(nKey)) {
+			for (var eKey in gl.edgesDataset._data) {
+				if (gl.edgesDataset._data.hasOwnProperty(eKey)) {
+					if(gl.edgesDataset._data[eKey].from === gl.nodesDataset._data[nKey].id)
+					{
+						
+					}
+				}
+			}
+		}
+	}
+}
 
 Node._editNodeData = function(nodeData,callback)
 {

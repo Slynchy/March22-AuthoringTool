@@ -22,6 +22,20 @@ function ToggleButtons(onOrOff)
 	}
 }
 
+function FindNextNarrativeNode(srcNode)
+{
+	for (var key in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(key)) {
+			if(gl.nodesDataset._data[key].nodeType == Node.NodeTypes.narrative)
+			{
+				gl.nodesDataset._data[key];
+				return 
+			}
+		}
+	}
+	return 0;
+}
+
 function HideFunctionNodes()
 {
 	var hideNodes = document.getElementById("settHideFunctions").checked;
@@ -55,14 +69,21 @@ function HideFunctionNodes()
 					}
 
 					// We exclude these nodes because they are important :)
-					if(edgesFromNode.length != 1 || edgesToNode.length == 0)
+					if(edgesFromNode.length != 1 || edgesToNode.length == 0 || edgesToNode.length > 1)
 					{
 						continue;
 					}
 
 					for (var i = 0; i < edgesToNode.length; i++) {
 						var edge = edgesToNode[i];
-						gl.edgesDataset._data[edge.id].to = edgesFromNode[0].to;
+						if(gl.nodesDataset._data[edgesFromNode[0].to].nodeType === narrative)
+						{
+							gl.edgesDataset._data[edge.id].to = edgesFromNode[0].to;
+						}
+						else
+						{
+							// find next narrative node
+						}
 					}
 
 					delete gl.nodesDataset._data[key];
