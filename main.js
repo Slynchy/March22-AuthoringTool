@@ -62,44 +62,22 @@ function HideFunctionNodes()
 				var node = gl.nodesDataset._data[key];
 				if(node.nodeType.name != Node.NodeTypes.narrative.name)
 				{
-					var edgesToNode = [];
-					var edgesFromNode = [];
-					for (var eKey in gl.edgesDataset._data) {
-						if (gl.edgesDataset._data.hasOwnProperty(eKey)) {
-							var edge = gl.edgesDataset._data[eKey];
-							if(edge.from === node.id)
-							{
-								edgesFromNode.push(edge);
-							}
-							else if( edge.to === node.id)
-							{
-								edgesToNode.push(edge);
-							}
-							else continue;
-						}
-					}
 
 					// We exclude these nodes because they are important :)
-					if(edgesFromNode.length != 1 || edgesToNode.length == 0 || edgesToNode.length > 1)
+					if(node.children.length != 1 || node.parents.length == 0 || node.parents.length > 1)
 					{
 						continue;
 					}
 
-					for (var i = 0; i < edgesToNode.length; i++) {
-						var edge = edgesToNode[i];
-						if(gl.nodesDataset._data[edgesFromNode[0].to].nodeType === narrative)
-						{
-							gl.edgesDataset._data[edge.id].to = edgesFromNode[0].to;
-						}
-						else
-						{
-							// find next narrative node
-						}
-					}
 
+					
 					delete gl.nodesDataset._data[key];
-				} else continue;
-				delete gl.edgesDataset._data[edgesFromNode[0].id];
+				}
+				else 
+				{
+					continue;
+				}
+				//delete gl.edgesDataset._data[edgesFromNode[0].id];
 			}
 		}
 
