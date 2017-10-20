@@ -26,7 +26,7 @@ function FindNextNarrativeNode(srcNode)
 {
 	for (var key in gl.nodesDataset._data) {
 		if (gl.nodesDataset._data.hasOwnProperty(key)) {
-			if(gl.nodesDataset._data[key].nodeType == Node.NodeTypes.narrative)
+			if(gl.nodesDataset._data[key].nodeType.name == Node.NodeTypes.narrative.name)
 			{
 				gl.nodesDataset._data[key];
 				return 
@@ -49,7 +49,7 @@ function HideFunctionNodes()
 		for (var key in gl.nodesDataset._data) {
 			if (gl.nodesDataset._data.hasOwnProperty(key)) {
 				var node = gl.nodesDataset._data[key];
-				if(node.nodeType !== Node.NodeTypes.narrative)
+				if(node.nodeType.name != Node.NodeTypes.narrative.name)
 				{
 					var edgesToNode = [];
 					var edgesFromNode = [];
