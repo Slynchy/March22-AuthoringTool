@@ -36,6 +36,17 @@ function FindNextNarrativeNode(srcNode)
 	return 0;
 }
 
+function _LinkParentToChildren(node)
+{
+	if(node.nodeType.name == Node.NodeTypes.narrative.name) return;
+	node.parents.forEach(function(p) {
+		node.children.forEach(function(c) {
+			p.to = c.to;
+			_LinkParentToChildren(gl.nodesDataset._data[c.to]);
+		}, this);
+	}, this);
+}
+
 function HideFunctionNodes()
 {
 	var hideNodes = document.getElementById("settHideFunctions").checked;
