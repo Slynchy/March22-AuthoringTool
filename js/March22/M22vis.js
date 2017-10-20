@@ -371,7 +371,7 @@ function UpdateSelectedNode()
 		gl.nodesDataset.update([ { 
 			id: gl.selectedNode.id, 
 			label: gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Name].value,
-			title: gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.File].value,
+			//title: gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.File].value,
 			level: parseInt(gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Level].value),
 			SCRIPT_TXT: gl.aceEditor.getValue()
 		} ]);
