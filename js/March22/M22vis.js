@@ -263,6 +263,12 @@ function draw()
 		nodes: gl.nodesDataset
 	}
 
+	for (var key in data.edges._data) {
+		if (data.edges._data.hasOwnProperty(key)) {
+			data.edges._data[key].title = key;
+		}
+	}
+
 	// create a network
 	var container = document.getElementById('mynetwork');
 	gl.events.onAddEdge = onAddEdge;
@@ -277,7 +283,7 @@ function draw()
 		{
 	        hierarchical: 
 			{
-	            direction: "UD",
+	            direction: "LR",
 	            sortMethod: "directed",
 	            nodeSpacing: 250
 	        }
@@ -368,6 +374,21 @@ function GetHighestNodeLevel()
 	}
 	if(highest === false) return 0;
 	else return highest;
+}
+
+function GetLowestNodeLevel()
+{
+	var lowest = false;
+	for (var key in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(key)) {
+			if(typeof(lowest) === 'boolean' || gl.nodesDataset._data[key].level < lowest)
+			{
+				lowest = gl.nodesDataset._data[key].level;
+			}
+		}
+	}
+	if(lowest === false) return 0;
+	else return lowest;
 }
 
 function UpdateSelectedNode()

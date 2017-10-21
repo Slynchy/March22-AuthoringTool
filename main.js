@@ -36,15 +36,167 @@ function FindNextNarrativeNode(srcNode)
 	return 0;
 }
 
-function _LinkParentToChildren(node)
+function _GetPreviousNarrativeNode(parent)
+{
+	if(parent.nodeType.name == Node.NodeTypes.narrative.name)
+	{
+		return parent;	
+	}
+	else
+	{
+		if(parent.parents[0])
+			return _GetPreviousNarrativeNode(gl.nodesDataset._data[parent.parents[0].from]);
+		else
+			return null;
+	}
+}
+
+function _ShouldDeleteNode(node, useCode)
+{
+	var CODE = {
+		NOPE: 0,
+		GREATER_THAN_ONE_CHILD: 1,
+		NO_PARENTS: 2,
+		TOO_MANY_PARENTS: 3,
+		NARRATIVE_NODE: 4,
+		NO_CHILDREN: 5
+	}
+	var batman = false;
+
+	if(node.children.length > 1)
+	{
+		batman = CODE.GREATER_THAN_ONE_CHILD;
+	} 
+	else if(node.children.length == 0)
+	{
+		batman = CODE.NO_CHILDREN;
+	}
+	else if(node.parents.length == 0)
+	{
+		batman = CODE.NO_PARENTS;
+	} 
+	else if(node.parents.length > 1) 
+	{
+		batman = CODE.TOO_MANY_PARENTS;
+	}
+	else if(node.nodeType.name == Node.NodeTypes.narrative.name)
+	{
+		batman = CODE.NARRATIVE_NODE;
+	}
+
+	if(useCode)
+	{
+		if(batman === false) return true;
+		else return batman;	
+	}
+	else
+	{
+		if(batman === false) return true;
+		else return false;	
+	}
+
+}
+
+function _LinkParentToChildren(node, queuedEdgesForDeletion)
 {
 	if(node.nodeType.name == Node.NodeTypes.narrative.name) return;
-	node.parents.forEach(function(p) {
-		node.children.forEach(function(c) {
-			p.to = c.to;
-			_LinkParentToChildren(gl.nodesDataset._data[c.to]);
-		}, this);
-	}, this);
+
+	for (var x = 0; x < node.parents.length; x++) {
+		var p = node.parents[x];
+		for (var y = 0; y < node.children.length; y++) {
+			var c = node.children[y];
+			var parentNode = gl.nodesDataset._data[p.from];
+			var childNode = gl.nodesDataset._data[c.to];
+
+			if(_ShouldDeleteNode(childNode) === false && _ShouldDeleteNode(childNode,true) != 4)
+			{
+				queuedEdgesForDeletion.push(c.id);
+			}
+
+			if(parentNode && parentNode.nodeType.name != Node.NodeTypes.narrative.name)
+			{
+				// backpropogate 
+				parentNode = _GetPreviousNarrativeNode(parentNode);
+				p.from = parentNode.id;
+			}
+			else if(parentNode)
+			{
+				p.to = c.to;
+				_LinkParentToChildren(gl.nodesDataset._data[c.to], queuedEdgesForDeletion);
+			}
+		};
+	};
+	return node;
+}
+
+function GetFirstNode()
+{
+	var level = GetLowestNodeLevel();
+	var nodes = [];
+
+	for (var key in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(key)) {
+			if( gl.nodesDataset._data[key].level === level)
+			{
+				nodes.push(gl.nodesDataset._data[key]);
+			}
+		}
+	}
+
+	if(nodes.length >= 1)
+		return nodes[0];
+	else
+		return null;
+}
+
+function GetFinalNode()
+{
+	return ResolveNodeID(GetHighestNodeLevel());
+}
+
+function ResolveNodeID(id)
+{
+	for (var key in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(key)) {
+			if(key === id)
+				return gl.nodesDataset._data[key];
+		}
+	}
+	return null;
+}
+
+function _CompressNodeLevel_Recursive(node, prevNode)
+{
+	if(prevNode && node && node.level != prevNode.level + 1)
+	{
+		node.level = prevNode.level+1;
+	}
+	else if(!node) 
+	{
+		return;
+	}
+
+	if(node.children.length > 1)
+	{
+		for (var i = 0; i < node.children.length; i++) {
+			_CompressNodeLevel_Recursive(gl.nodesDataset._data[node.children[i].to], node);
+		}
+	}
+	else if(node.children.length != 0)
+	{
+		_CompressNodeLevel_Recursive(gl.nodesDataset._data[node.children[0].to], node);
+	}
+	else 
+	{
+		return;
+	}
+}
+
+function CompressNodeLevels()
+{
+	var firstNode = GetFirstNode();
+	
+	_CompressNodeLevel_Recursive(firstNode);
 }
 
 function HideFunctionNodes()
@@ -57,6 +209,7 @@ function HideFunctionNodes()
 		// iterate through ALL nodes, stash the function nodes and edges, remove them and re-draw
 		gl._STASHED_DATA = JSON.stringify(SaveNodesAndEdges())
 
+		var queuedEdgesForDeletion = [];
 		for (var key in gl.nodesDataset._data) {
 			if (gl.nodesDataset._data.hasOwnProperty(key)) {
 				var node = gl.nodesDataset._data[key];
@@ -69,7 +222,7 @@ function HideFunctionNodes()
 						continue;
 					}
 
-
+					node = _LinkParentToChildren(node, queuedEdgesForDeletion);
 					
 					delete gl.nodesDataset._data[key];
 				}
@@ -77,9 +230,25 @@ function HideFunctionNodes()
 				{
 					continue;
 				}
-				//delete gl.edgesDataset._data[edgesFromNode[0].id];
 			}
 		}
+		
+		queuedEdgesForDeletion = queuedEdgesForDeletion.filter(function(elem, index, self) {
+			return index == self.indexOf(elem);
+		})
+
+		for (var i = 0; i < queuedEdgesForDeletion.length; i++) {
+			for (var k in gl.edgesDataset._data) {
+				if(k == queuedEdgesForDeletion[i])
+				{
+					delete gl.edgesDataset._data[k];
+					break;
+				}
+			}
+		}
+
+		Node.UpdateNodeChildren();
+		CompressNodeLevels();
 
 		draw();
 	}
@@ -103,8 +272,10 @@ function HideFunctionNodes()
 					var realNode = gl.nodesDataset._data[nKey];
 					if(nKey === stashedNode.id)
 					{
-						SetNode(stashedNode,realNode);
-						//stashedNode.SCRIPT_TXT = realNode.SCRIPT_TXT;
+						// Hack fix: stops misaligned nodes after revealing
+						var cacheLevel = stashedNode.level;
+							SetNode(stashedNode,realNode);
+						stashedNode.level = cacheLevel;
 						break;
 					}
 				}
