@@ -36,3 +36,190 @@ Node.Function.prototype._createFuncOptionsHTML = function()
 {
 
 }
+
+Node._ShouldDeleteNode = function(node, useCode)
+{
+	var CODE = {
+		NOPE: 0,
+		GREATER_THAN_ONE_CHILD: 1,
+		NO_PARENTS: 2,
+		TOO_MANY_PARENTS: 3,
+		NARRATIVE_NODE: 4,
+		NO_CHILDREN: 5
+	}
+	var batman = false;
+
+	if(node.children.length > 1)
+	{
+		batman = CODE.GREATER_THAN_ONE_CHILD;
+	} 
+	else if(node.children.length == 0)
+	{
+		batman = CODE.NO_CHILDREN;
+	}
+	else if(node.parents.length == 0)
+	{
+		batman = CODE.NO_PARENTS;
+	} 
+	else if(node.parents.length > 1) 
+	{
+		batman = CODE.TOO_MANY_PARENTS;
+	}
+	else if(node.nodeType.name == Node.NodeTypes.narrative.name)
+	{
+		batman = CODE.NARRATIVE_NODE;
+	}
+
+	if(useCode)
+	{
+		if(batman === false) return true;
+		else return batman;	
+	}
+	else
+	{
+		if(batman === false) return true;
+		else return false;	
+	}
+
+}
+
+// DEPRECATED
+Node.FindNextNarrativeNode = function(srcNode)
+{
+	for (var key in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(key)) {
+			if(gl.nodesDataset._data[key].nodeType.name == Node.NodeTypes.narrative.name)
+			{
+				gl.nodesDataset._data[key];
+				return 
+			}
+		}
+	}
+	return 0;
+}
+
+Node._GetPreviousNarrativeNode = function(parent)
+{
+	if(parent.nodeType.name == Node.NodeTypes.narrative.name)
+	{
+		return parent;	
+	}
+	else
+	{
+		if(parent.parents[0])
+			return Node._GetPreviousNarrativeNode(gl.nodesDataset._data[parent.parents[0].from]);
+		else
+			return null;
+	}
+}
+
+Node._LinkParentToChildren = function(node, queuedEdgesForDeletion)
+{
+	if(node.nodeType.name == Node.NodeTypes.narrative.name) return;
+
+	for (var x = 0; x < node.parents.length; x++) {
+		var p = node.parents[x];
+		for (var y = 0; y < node.children.length; y++) {
+			var c = node.children[y];
+			var parentNode = gl.nodesDataset._data[p.from];
+			var childNode = gl.nodesDataset._data[c.to];
+
+			if(Node._ShouldDeleteNode(childNode) === false && Node._ShouldDeleteNode(childNode,true) != 4)
+			{
+				queuedEdgesForDeletion.push(c.id);
+			}
+
+			if(parentNode && parentNode.nodeType.name != Node.NodeTypes.narrative.name)
+			{
+				// backpropogate 
+				parentNode = Node._GetPreviousNarrativeNode(parentNode);
+				p.from = parentNode.id;
+			}
+			else if(parentNode)
+			{
+				p.to = c.to;
+				Node._LinkParentToChildren(gl.nodesDataset._data[c.to], queuedEdgesForDeletion);
+			}
+		};
+	};
+	return node;
+}
+
+Node.GetFirstNode = function()
+{
+	var level = GetLowestNodeLevel();
+	var nodes = [];
+
+	for (var key in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(key)) {
+			if( gl.nodesDataset._data[key].level === level)
+			{
+				nodes.push(gl.nodesDataset._data[key]);
+			}
+		}
+	}
+
+	if(nodes.length >= 1)
+		return nodes[0];
+	else
+		return null;
+}
+
+// DEPRECATED/NON-WORKING
+Node.GetFinalNode = function()
+{
+	return Node.ResolveNodeID(GetHighestNodeLevel());
+}
+
+Node.ResolveNodeID = function(id)
+{
+	for (var key in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(key)) {
+			if(key === id)
+				return gl.nodesDataset._data[key];
+		}
+	}
+	return null;
+}
+
+Node._CompressNodeLevel_Recursive = function(node, prevNode)
+{
+	if(prevNode && node && node.level != prevNode.level + 1)
+	{
+		node.level = prevNode.level+1;
+	}
+	else if(!node) 
+	{
+		return;
+	}
+
+	if(node.children.length > 1)
+	{
+		for (var i = 0; i < node.children.length; i++) {
+			Node._CompressNodeLevel_Recursive(gl.nodesDataset._data[node.children[i].to], node);
+		}
+	}
+	else if(node.children.length != 0)
+	{
+		Node._CompressNodeLevel_Recursive(gl.nodesDataset._data[node.children[0].to], node);
+	}
+	else 
+	{
+		return;
+	}
+}
+
+Node.CompressNodeLevels = function()
+{
+	var firstNode = Node.GetFirstNode();
+	Node._CompressNodeLevel_Recursive(firstNode);
+}
+
+Node.SetNode = function(node,props)
+{
+	for (var key in props) {
+		if (props.hasOwnProperty(key)) {
+			node[key] = props[key];
+		}
+	}
+}
