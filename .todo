@@ -6,11 +6,13 @@
 
 Backlog:
     Bugs:    
-        ☐ Multiple single-destination function nodes cause entire tree to be hidden when hiding function nodes
+        ✔ Multiple single-destination function nodes cause entire tree to be hidden when hiding function nodes
+            ✔ Need to also adjust the node levels to account for missing nodes
     Features:
         ☐ Preview system
         ☐ Settings button/modal
             ☐ Make VisJS styling configurable
+            ☐ Add settings to project saving/loading
         ☐ Generic loading modal to show when busy with async operations
         ☐ Localisation
             ☐ Unicode-friendly font

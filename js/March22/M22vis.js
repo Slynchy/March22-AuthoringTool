@@ -36,6 +36,7 @@ onEditNode = function(nodeData, callback)
 	{
 		Node._editNodeData(nodeData,callback);
 		gl.aceEditor.setValue(nodeData.SCRIPT_TXT);
+		Node.UpdateNodeChildren();
 	},
 	function()
 	{
@@ -60,6 +61,7 @@ onEditNode = function(nodeData, callback)
 onEditEdge = function(edgeData, callback)
 {
 	callback(edgeData);
+	Node.UpdateNodeChildren();
 }
 
 Node._createNodeModal = function(callback,createCallback)
@@ -94,6 +96,30 @@ Node._populateNodeModalParameters = function(nodeData)
 	}
 }
 
+Node.UpdateNodeChildren = function()
+{
+	console.log("Updating node children");
+
+	for (var nKey in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(nKey)) {
+			gl.nodesDataset._data[nKey].children = [];
+			gl.nodesDataset._data[nKey].parents = [];
+			for (var eKey in gl.edgesDataset._data) {
+				if (gl.edgesDataset._data.hasOwnProperty(eKey)) {
+					if(gl.edgesDataset._data[eKey].from === gl.nodesDataset._data[nKey].id)
+					{
+						gl.nodesDataset._data[nKey].children.push(gl.edgesDataset._data[eKey]);
+					}
+
+					if(gl.edgesDataset._data[eKey].to === gl.nodesDataset._data[nKey].id)
+					{
+						gl.nodesDataset._data[nKey].parents.push(gl.edgesDataset._data[eKey]);
+					}
+				}
+			}
+		}
+	}
+}
 
 Node._editNodeData = function(nodeData,callback)
 {
@@ -161,13 +187,14 @@ Node._editNodeData = function(nodeData,callback)
 
 onAddNode = function(nodeData, callback)
 {
-	Node._createNodeModal(function(){Node._editNodeData(nodeData,callback)});
+	Node._createNodeModal(function(){Node._editNodeData(nodeData, function(){ callback(nodeData); Node.UpdateNodeChildren(); })});
 }
 
 onDeleteNode = function(nodeData,callback)
 {
 	gl.aceEditor.setValue("");
 	callback(nodeData);
+	Node.UpdateNodeChildren();
 }
 
 onDeleteEdge = function(edgeData,callback)
@@ -181,6 +208,7 @@ onDeleteEdge = function(edgeData,callback)
 	toNode.startOfNode = "";
 
 	callback(edgeData);
+	Node.UpdateNodeChildren();
 }
 
 onAddEdge = function(edgeData,callback) 
@@ -214,6 +242,7 @@ onAddEdge = function(edgeData,callback)
 	
 	UpdateSelectedNode();
 	callback(edgeData);
+	Node.UpdateNodeChildren();
 }
 
 function destroy() 
@@ -227,10 +256,17 @@ function destroy()
 function draw() 
 {
 	destroy();
+	Node.UpdateNodeChildren();
 	
 	var data = {
 		edges: gl.edgesDataset,
 		nodes: gl.nodesDataset
+	}
+
+	for (var key in data.edges._data) {
+		if (data.edges._data.hasOwnProperty(key)) {
+			data.edges._data[key].title = key;
+		}
 	}
 
 	// create a network
@@ -247,7 +283,7 @@ function draw()
 		{
 	        hierarchical: 
 			{
-	            direction: "UD",
+	            direction: "LR",
 	            sortMethod: "directed",
 	            nodeSpacing: 250
 	        }
@@ -340,6 +376,21 @@ function GetHighestNodeLevel()
 	else return highest;
 }
 
+function GetLowestNodeLevel()
+{
+	var lowest = false;
+	for (var key in gl.nodesDataset._data) {
+		if (gl.nodesDataset._data.hasOwnProperty(key)) {
+			if(typeof(lowest) === 'boolean' || gl.nodesDataset._data[key].level < lowest)
+			{
+				lowest = gl.nodesDataset._data[key].level;
+			}
+		}
+	}
+	if(lowest === false) return 0;
+	else return lowest;
+}
+
 function UpdateSelectedNode()
 {
 	if(gl.selectedNode != null)
@@ -356,7 +407,7 @@ function UpdateSelectedNode()
 		gl.nodesDataset.update([ { 
 			id: gl.selectedNode.id, 
 			label: gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Name].value,
-			title: gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.File].value,
+			//title: gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.File].value,
 			level: parseInt(gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Level].value),
 			SCRIPT_TXT: gl.aceEditor.getValue()
 		} ]);

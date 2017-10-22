@@ -1,27 +1,5 @@
 
 
-// This is filled with functions where the parameters are the complete nodes and complete edges, for any modifications.
-// { func(), storedVariables[] }
-var queuedActions = [];
-
-function CompileNode(_scriptStr, _scriptStrPos, result)
-{
-    // this function compiles script lines until it reaches an IF statement or a checkpoint
-    // returns the new script str pos
-}
-
-function ToggleButtons(onOrOff)
-{
-	document.getElementById("fileItem").disabled = !onOrOff;
-	document.getElementById("fileItemSave").disabled = !onOrOff;
-	document.getElementById("compileButton").disabled = !onOrOff;
-	for (var index = 0; index < gl.nodeInfoBoxes.length; index++) {
-		var element = gl.nodeInfoBoxes[index];
-		if(element)
-			element.disabled = !onOrOff;
-	}
-}
-
 function HideFunctionNodes()
 {
 	var hideNodes = document.getElementById("settHideFunctions").checked;
@@ -32,44 +10,46 @@ function HideFunctionNodes()
 		// iterate through ALL nodes, stash the function nodes and edges, remove them and re-draw
 		gl._STASHED_DATA = JSON.stringify(SaveNodesAndEdges())
 
+		var queuedEdgesForDeletion = [];
 		for (var key in gl.nodesDataset._data) {
 			if (gl.nodesDataset._data.hasOwnProperty(key)) {
 				var node = gl.nodesDataset._data[key];
-				if(node.nodeType !== Node.NodeTypes.narrative)
+				if(node.nodeType.name != Node.NodeTypes.narrative.name)
 				{
-					var edgesToNode = [];
-					var edgesFromNode = [];
-					for (var eKey in gl.edgesDataset._data) {
-						if (gl.edgesDataset._data.hasOwnProperty(eKey)) {
-							var edge = gl.edgesDataset._data[eKey];
-							if(edge.from === node.id)
-							{
-								edgesFromNode.push(edge);
-							}
-							else if( edge.to === node.id)
-							{
-								edgesToNode.push(edge);
-							}
-							else continue;
-						}
-					}
 
 					// We exclude these nodes because they are important :)
-					if(edgesFromNode.length != 1 || edgesToNode.length == 0)
+					if(node.children.length != 1 || node.parents.length == 0 || node.parents.length > 1)
 					{
 						continue;
 					}
 
-					for (var i = 0; i < edgesToNode.length; i++) {
-						var edge = edgesToNode[i];
-						gl.edgesDataset._data[edge.id].to = edgesFromNode[0].to;
-					}
-
+					node = Node._LinkParentToChildren(node, queuedEdgesForDeletion);
+					
 					delete gl.nodesDataset._data[key];
-				} else continue;
-				delete gl.edgesDataset._data[edgesFromNode[0].id];
+				}
+				else 
+				{
+					continue;
+				}
 			}
 		}
+		
+		queuedEdgesForDeletion = queuedEdgesForDeletion.filter(function(elem, index, self) {
+			return index == self.indexOf(elem);
+		})
+
+		for (var i = 0; i < queuedEdgesForDeletion.length; i++) {
+			for (var k in gl.edgesDataset._data) {
+				if(k == queuedEdgesForDeletion[i])
+				{
+					delete gl.edgesDataset._data[k];
+					break;
+				}
+			}
+		}
+
+		Node.UpdateNodeChildren();
+		Node.CompressNodeLevels();
 
 		draw();
 	}
@@ -93,8 +73,10 @@ function HideFunctionNodes()
 					var realNode = gl.nodesDataset._data[nKey];
 					if(nKey === stashedNode.id)
 					{
-						SetNode(stashedNode,realNode);
-						//stashedNode.SCRIPT_TXT = realNode.SCRIPT_TXT;
+						// Hack fix: stops misaligned nodes after revealing
+						var cacheLevel = stashedNode.level;
+							SetNode(stashedNode,realNode);
+						stashedNode.level = cacheLevel;
 						break;
 					}
 				}
@@ -105,15 +87,6 @@ function HideFunctionNodes()
 		LoadProject(gl._STASHED_DATA);
 
 		gl._STASHED_DATA = null;
-	}
-}
-
-function SetNode(node,props)
-{
-	for (var key in props) {
-		if (props.hasOwnProperty(key)) {
-			node[key] = props[key];
-		}
 	}
 }
 
@@ -224,15 +197,4 @@ function SaveScripts()
 	SaveScripts_Async();
 	alert("Saving scripts, please be patient!");
 }
-
-
-
-
-
-
-
-
-
-
-
 
