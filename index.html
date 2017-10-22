@@ -14,6 +14,7 @@
 	<h2>March22-AuthoringTool</h2>
 	<input id="fileItem" type="button" onclick="CreateLoadMenu()" value="Load">
 	<input id="fileItemSave" type="button" onclick="SaveProject()" title="Select Script Files" value="Save">
+	<input id="settingsButton" type="button" onclick="Settings.CreateSettingsModal()" value="Settings">
 	<label>Hide functions? </label><input type="checkbox" id="settHideFunctions" onchange="HideFunctionNodes()" style="vertical-align:middle;"></input>
 	<br>
 	<input id="compileButton" type="button" onclick="SaveScripts()" value="Compile script files">
@@ -38,6 +39,7 @@
 		"js/FileSaver.min.js",
 		"js/March22/Globals.js",
 		"js/March22/HTML.js",
+		"js/March22/Settings.js",
 		"js/March22/Functionality.js",
 		"js/March22/M22Compiler.js",
 		"js/March22/Node.js",
