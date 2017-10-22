@@ -32,46 +32,30 @@
 
 <script type="text/javascript" src="js/JSLoader.js"></script>
 <script type="text/javascript">
-	var _BOOTORDER = {
-		Ace: "js/ace/ace.js",
-		VisJS: "js/visjs/vis.min.js",
-		FileSaver: "js/FileSaver.min.js",
-		Globals: "js/March22/Globals.js",
-		HTML: "js/March22/HTML.js",
-		Functionality: "js/March22/Functionality.js",
-		M22Compiler: "js/March22/M22Compiler.js",
-		Node: "js/March22/Node.js",
-		NodeTypes: "js/March22/NodeTypes.js",
-		M22vis: "js/March22/M22vis.js",
-		Modal: "js/March22/Modal.js",
-		main: "main.js"
-	};
+	var _BOOTORDER = [
+		"js/ace/ace.js",
+		"js/visjs/vis.min.js",
+		"js/FileSaver.min.js",
+		"js/March22/Globals.js",
+		"js/March22/HTML.js",
+		"js/March22/Functionality.js",
+		"js/March22/M22Compiler.js",
+		"js/March22/Node.js",
+		"js/March22/NodeTypes.js",
+		"js/March22/M22vis.js",
+		"js/March22/Modal.js",
+		"main.js"
+	];
+	var _BOOTCOUNTER = -1;
+	var LoadJS_R = function()
+	{
+		if(_BOOTCOUNTER < _BOOTORDER.length-1)
+			_BOOTCOUNTER++;
+		else return;
+		Loader.load(_BOOTORDER[_BOOTCOUNTER], LoadJS_R);
+	}
+	LoadJS_R();
 
-	Loader.load('js/ace/ace.js', function() {
-		Loader.load('js/visjs/vis.min.js', function() {
-			Loader.load('js/FileSaver.min.js', function() {
-				Loader.load('js/March22/Globals.js', function() {
-					Loader.load('js/March22/HTML.js', function() {
-						Loader.load('js/March22/Functionality.js', function() {
-							Loader.load('js/March22/M22Compiler.js', function() {
-								Loader.load('js/March22/Node.js', function() {
-									Loader.load('js/March22/NodeTypes.js', function() {
-										Loader.load('js/March22/M22vis.js', function() {
-											Loader.load('js/March22/Modal.js', function() {
-												Loader.load('main.js', function() {
-													console.log("Initializing main.js...");
-												});
-											});
-										});
-									});
-								});
-							});
-						});
-					});
-				});
-			});
-		});
-	});
 </script>
 <!-- <script type="text/javascript" src="main.js"></script> -->
     
