@@ -65,17 +65,20 @@ function HideFunctionNodes()
 		
 		gl._STASHED_DATA = JSON.parse(gl._STASHED_DATA);
 		// edit stashed data with edited nodes
-		for (var i = 0; i < gl._STASHED_DATA["nodes"].length; i++) {
+		for (var i = 0; i < gl._STASHED_DATA["nodes"].length; i++) 
+		{
 			var stashedNode = gl._STASHED_DATA["nodes"][i];
 
-			for (var nKey in gl.nodesDataset._data) {
-				if (gl.nodesDataset._data.hasOwnProperty(nKey)) {
+			for (var nKey in gl.nodesDataset._data) 
+			{
+				if (gl.nodesDataset._data.hasOwnProperty(nKey)) 
+				{
 					var realNode = gl.nodesDataset._data[nKey];
 					if(nKey === stashedNode.id)
 					{
 						// Hack fix: stops misaligned nodes after revealing
 						var cacheLevel = stashedNode.level;
-							SetNode(stashedNode,realNode);
+							Node.SetNode(stashedNode,realNode);
 						stashedNode.level = cacheLevel;
 						break;
 					}
