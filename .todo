@@ -6,7 +6,6 @@
 
 Backlog:
     Bugs:    
-        ✔ Script compilation is producing unordered scripts, which would be fine but the starting node is not correct either
     Features:
         ☐ Preview system
         ☐ Settings button/modal
@@ -27,6 +26,7 @@ Completed:
         ✔ Functions that end in a boolean have the boolean appended even if it is an optional parameter or breaks the function
         ✔ Multiple single-destination function nodes cause entire tree to be hidden when hiding function nodes
             ✔ Need to also adjust the node levels to account for missing nodes
+        ✔ Script compilation is producing unordered scripts, which would be fine but the starting node is not correct either
 
     Features:
         ✔ New nodes go to the highest level by default
