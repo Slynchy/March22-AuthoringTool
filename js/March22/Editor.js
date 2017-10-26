@@ -1,0 +1,1 @@
+editor.getSession().setUseWrapMode(true);
