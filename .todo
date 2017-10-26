@@ -6,11 +6,12 @@
 
 Backlog:
     Bugs:    
+        ✔ Script compilation is producing unordered scripts, which would be fine but the starting node is not correct either
     Features:
         ☐ Preview system
-        ✔ Settings button/modal
-            ✔ Make VisJS styling configurable
-            ✔ Add settings to project saving/loading
+        ☐ Settings button/modal
+            ☐ Make VisJS styling configurable
+            ☐ Add settings to project saving/loading
         ☐ Generic loading modal to show when busy with async operations
         ☐ Localisation
             ☐ Unicode-friendly font
