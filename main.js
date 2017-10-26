@@ -75,7 +75,7 @@ function HideFunctionNodes()
 					{
 						// Hack fix: stops misaligned nodes after revealing
 						var cacheLevel = stashedNode.level;
-							SetNode(stashedNode,realNode);
+							Node.SetNode(stashedNode,realNode);
 						stashedNode.level = cacheLevel;
 						break;
 					}
@@ -175,12 +175,18 @@ async function SaveScripts_Async()
 			}
 		);
 	}
-	
+
+	var result = "";
+	var firstNode = Node.GetFirstNode();
+	result += firstNode.startOfNode + "\n\n";
+	result += firstNode.SCRIPT_TXT + "\n\n";
+	result += "\n\n" + firstNode.endOfNode + "\n\n";
 	for(i = 0; i < files.length; i++)
 	{
-		var result = "";
 		for(n = 0; n < files[i].nodes.length; n++)
 		{ 
+			if(files[i].nodes[n].id == firstNode.id)
+				continue;
 			result += files[i].nodes[n].startOfNode + "\n\n";
 			result += files[i].nodes[n].SCRIPT_TXT + "\n\n";
 			result += "\n\n" + files[i].nodes[n].endOfNode + "\n\n";
