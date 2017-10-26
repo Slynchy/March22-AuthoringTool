@@ -330,7 +330,7 @@ function draw()
 			try
 			{
 				gl.aceEditor.setValue(gl.selectedNode.SCRIPT_TXT);
-				if(gl.selectedNode.nodeType !== Node.NodeTypes.narrative) gl.aceEditor.setReadOnly(true);
+				if(gl.selectedNode.nodeType.name != Node.NodeTypes.narrative.name) gl.aceEditor.setReadOnly(true);
 				else gl.aceEditor.setReadOnly(false);
 				gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.Name].value = gl.selectedNode.label;
 				if(gl.nodeInfoBoxes[gl.nodeInfoBoxesIndex.ID])
