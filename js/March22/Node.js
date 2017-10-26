@@ -109,7 +109,22 @@ Node._GetPreviousNarrativeNode = function(parent)
 		if(parent.parents[0])
 			return Node._GetPreviousNarrativeNode(gl.nodesDataset._data[parent.parents[0].from]);
 		else
-			return null;
+			return parent;
+	}
+}
+
+Node._GetNextNarrativeNode = function(child)
+{
+	if(child.nodeType.name == Node.NodeTypes.narrative.name)
+	{
+		return child;	
+	}
+	else
+	{
+		if(child.children[0])
+			return Node._GetNextNarrativeNode(gl.nodesDataset._data[child.children[0].to]);
+		else
+			return child;
 	}
 }
 
@@ -133,7 +148,13 @@ Node._LinkParentToChildren = function(node, queuedEdgesForDeletion)
 			{
 				// backpropogate 
 				parentNode = Node._GetPreviousNarrativeNode(parentNode);
-				p.from = parentNode.id;
+				if(parentNode.nodeType.name == Node.NodeTypes.narrative.name)
+					p.from = parentNode.id;
+				else 
+				{
+					var nextNode = Node._GetNextNarrativeNode(node);
+					p.to = nextNode.id;
+				}
 			}
 			else if(parentNode)
 			{
