@@ -75,7 +75,7 @@ function HideFunctionNodes()
 					{
 						// Hack fix: stops misaligned nodes after revealing
 						var cacheLevel = stashedNode.level;
-							SetNode(stashedNode,realNode);
+							Node.SetNode(stashedNode,realNode);
 						stashedNode.level = cacheLevel;
 						break;
 					}
