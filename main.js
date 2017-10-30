@@ -119,6 +119,9 @@ function LoadProject(jsonStr)
 	var temp = JSON.parse(jsonStr);
 	gl.nodesDataset = new vis.DataSet(temp.nodes);
 	gl.edgesDataset = new vis.DataSet(temp.edges);
+
+	if(temp.settings)
+		Settings.options = temp.settings
 	draw();
 }
 
@@ -147,6 +150,7 @@ function SaveNodesAndEdges()
 function SaveProject()
 {
 	var output = SaveNodesAndEdges();
+	output.settings = Settings.options;
 	var blob = new Blob([JSON.stringify(output)], {type: "text/plain;charset=utf-8"});
 	saveAs(blob, "test.m22proj");
 }

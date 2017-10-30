@@ -348,12 +348,28 @@ Node._editNodeData = function(nodeData,callback)
 	{
 		case Node.NodeTypes.narrative:
 			nodeData.label = 'NewNode';
-			nodeData.color = { background: '#D2E5FF'};
+			
+			nodeData.color = { 
+				background: '#D2E5FF'
+			};
 		break;
 		case Node.NodeTypes.nullop:
 			nodeData = null;
 		break;
 		default:
+			if(Settings.options.funcNodeColour.selectedOption === 0) {
+				nodeData.color = { 
+					background: '#BB1010'
+				};
+			} else if(Settings.options.funcNodeColour.selectedOption === 1) {
+				nodeData.color = { 
+					background: '#10BB10'
+				};
+			} else if(Settings.options.funcNodeColour.selectedOption === 2) {
+				nodeData.color = { 
+					background: '#1010BB'
+				};
+			}
 		break;
 	}
 

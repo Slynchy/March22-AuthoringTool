@@ -9,20 +9,38 @@ Settings.types = {
     DROPDOWN : 2
 }
 
-Settings._createOption = function( props )
+Settings._findSettingFromId = function(id)
 {
-    var option = props;
-    var options = option.options;
+    for (var k in Settings.options) {
+        if (Settings.options.hasOwnProperty(k)) {
+            var element = Settings.options[k];
+            var eId = element.name + "_SETTINGS";
+            if(eId === id)
+                return Settings.options[k];
+        }
+    }
+}
 
+Settings._onChange = function (dom) 
+{
+    console.log("You just changed id '%s' to %i", dom.id,dom.selectedIndex);
+
+    var setting = Settings._findSettingFromId(dom.id);
+    setting.selectedOption = dom.selectedIndex;
+    setting = Settings._createOptionHTML(setting);
+}
+
+Settings._createOptionHTML = function(option) 
+{
     switch(option.type)
     {
         case Settings.types.CHECKBOX:
-            option.html = option.name + ': ' + '<input type="checkbox" onchange="" style="vertical-align:middle;"></input><br>';
+            option.html = option.name + ': ' + '<input type="checkbox" id="'+ option.id +'" onchange="Settings._onChange(this)" style="vertical-align:middle;"></input><br>';
         break;
         case Settings.types.DROPDOWN:
-            option.html = option.name + ': ' +'<select selectedIndex=0 onchange="">';
-            for (var i = 0; i < options.length; i++) {
-                var optHTML = '<option value="'+ options[i] +'">'+ options[i] +'</option>';;
+            option.html = option.name + ': ' +'<select selectedIndex=0 id="'+ option.id +'" onchange="Settings._onChange(this)">';
+            for (var i = 0; i < option.options.length; i++) {
+                var optHTML = '<option value="'+ option.options[i] +'">'+ option.options[i] +'</option>';;
                 option.html += optHTML;
             };
             option.html += '</select><br>';
@@ -34,12 +52,26 @@ Settings._createOption = function( props )
     return option;
 }
 
+Settings._createOption = function( props )
+{
+    var option = props;
+    var options = option.options;
+    
+    option.id = (option.name + '_SETTINGS');
+    option.selectedOption = 0; // non-zero for checkboxes == true, otherwise is index for selected option
+
+    option = Settings._createOptionHTML(option);
+
+    return option;
+}
+
 Settings.options = {};
 Settings._optionParams = {
-    nop: { 
-        name: "Test",
+    funcNodeColour: { 
+        name: "Function node colour",
         type: Settings.types.DROPDOWN,
-        options: [ "lots", "of", "options" ]
+        selectedOption: -1,
+        options: [ "Red", "Green", "Blue" ] // first is default
     },
 }
 for (var k in Settings._optionParams) {
