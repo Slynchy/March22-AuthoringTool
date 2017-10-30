@@ -162,6 +162,7 @@ function draw()
 		{
 	        hierarchical: 
 			{
+				enabled: Settings.options.disableSortByHierarchy.selectedOption == 1 ? false : true,
 	            direction: "LR",
 	            sortMethod: "directed",
 	            nodeSpacing: 250

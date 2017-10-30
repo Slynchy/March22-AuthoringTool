@@ -1,4 +1,11 @@
-
+function Init()
+{
+	for (var k in Settings._optionParams) {
+		if (Settings._optionParams.hasOwnProperty(k)) {
+			Settings.options[k] = Settings._createOption(Settings._optionParams[k]);
+		}
+	}
+}
 
 function HideFunctionNodes()
 {
@@ -122,6 +129,7 @@ function LoadProject(jsonStr)
 
 	if(temp.settings)
 		Settings.options = temp.settings
+		
 	draw();
 }
 
@@ -211,3 +219,4 @@ function SaveScripts()
 	alert("Saving scripts, please be patient!");
 }
 
+Init();
