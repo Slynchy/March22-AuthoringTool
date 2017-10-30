@@ -6,11 +6,9 @@
 
 Backlog:
     Bugs:    
+        ☐ Can hide function nodes when hierarchy is disabled, breaking the algo
     Features:
         ☐ Preview system
-        ☐ Settings button/modal
-            ☐ Make VisJS styling configurable
-            ☐ Add settings to project saving/loading
         ☐ Generic loading modal to show when busy with async operations
         ☐ Localisation
             ☐ Unicode-friendly font
@@ -30,3 +28,7 @@ Completed:
 
     Features:
         ✔ New nodes go to the highest level by default
+        ✔ Settings button/modal
+            ✔ Make VisJS styling configurable
+            ✔ Add settings to project saving/loading
+            ✔ Update the modal with set settings

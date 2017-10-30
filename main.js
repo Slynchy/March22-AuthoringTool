@@ -1,4 +1,11 @@
-
+function Init()
+{
+	for (var k in Settings._optionParams) {
+		if (Settings._optionParams.hasOwnProperty(k)) {
+			Settings.options[k] = Settings._createOption(Settings._optionParams[k]);
+		}
+	}
+}
 
 function HideFunctionNodes()
 {
@@ -65,11 +72,14 @@ function HideFunctionNodes()
 		
 		gl._STASHED_DATA = JSON.parse(gl._STASHED_DATA);
 		// edit stashed data with edited nodes
-		for (var i = 0; i < gl._STASHED_DATA["nodes"].length; i++) {
+		for (var i = 0; i < gl._STASHED_DATA["nodes"].length; i++) 
+		{
 			var stashedNode = gl._STASHED_DATA["nodes"][i];
 
-			for (var nKey in gl.nodesDataset._data) {
-				if (gl.nodesDataset._data.hasOwnProperty(nKey)) {
+			for (var nKey in gl.nodesDataset._data) 
+			{
+				if (gl.nodesDataset._data.hasOwnProperty(nKey)) 
+				{
 					var realNode = gl.nodesDataset._data[nKey];
 					if(nKey === stashedNode.id)
 					{
@@ -116,6 +126,10 @@ function LoadProject(jsonStr)
 	var temp = JSON.parse(jsonStr);
 	gl.nodesDataset = new vis.DataSet(temp.nodes);
 	gl.edgesDataset = new vis.DataSet(temp.edges);
+
+	if(temp.settings)
+		Settings.options = temp.settings
+		
 	draw();
 }
 
@@ -144,6 +158,7 @@ function SaveNodesAndEdges()
 function SaveProject()
 {
 	var output = SaveNodesAndEdges();
+	output.settings = Settings.options;
 	var blob = new Blob([JSON.stringify(output)], {type: "text/plain;charset=utf-8"});
 	saveAs(blob, "test.m22proj");
 }
@@ -204,3 +219,4 @@ function SaveScripts()
 	alert("Saving scripts, please be patient!");
 }
 
+Init();
