@@ -1,19 +1,8 @@
 /*
     Todo file for March22-AuthoringTool
-
-    If a task is ticked but in the backlog, that means it's in dev/selected for dev
 */
 
-Backlog:
-    Bugs:    
-        ☐ Can hide function nodes when hierarchy is disabled, breaking the algo
-    Features:
-        ☐ Preview system
-        ☐ Generic loading modal to show when busy with async operations
-        ☐ Localisation
-            ☐ Unicode-friendly font
-            ☐ New JS file to house all strings and localisations
-            ☐ Make existing frontend utilize said JS file
+https://trello.com/b/YnOfsE5N/march22-authoringtool
 
 Completed:
     Bugs:
