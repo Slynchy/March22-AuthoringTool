@@ -3,6 +3,11 @@ Globals = function()
 
 	this.aceEditor = ace.edit("textbox");
 	this.aceEditor.$blockScrolling = Infinity;
+	this.aceEditor.getSession().setUseWrapMode(true);
+
+	// This is filled with functions where the parameters are the complete nodes and complete edges, for any modifications.
+	// { func(), storedVariables[] }
+	this.queuedActions = [];
 
 	this.nodes = null;
 	this.edges = null;

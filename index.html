@@ -14,6 +14,7 @@
 	<h2>March22-AuthoringTool</h2>
 	<input id="fileItem" type="button" onclick="CreateLoadMenu()" value="Load">
 	<input id="fileItemSave" type="button" onclick="SaveProject()" title="Select Script Files" value="Save">
+	<input id="settingsButton" type="button" onclick="Settings.CreateSettingsModal()" value="Settings">
 	<label>Hide functions? </label><input type="checkbox" id="settHideFunctions" onchange="HideFunctionNodes()" style="vertical-align:middle;"></input>
 	<br>
 	<input id="compileButton" type="button" onclick="SaveScripts()" value="Compile script files">
@@ -22,8 +23,7 @@
 
 	<div id="nodeSettings">
 		<div class="nodeSetting"><label>Title: </label><input class="nodeItem" type="text" id="nName" oninput="UpdateSelectedNode()"></input></div>
-		<div class="nodeSetting"><label>Script file: </label><input class="nodeItem" type="text" id="nFile" oninput="UpdateSelectedNode()"></input></div>
-		<div class="nodeSetting"><label>Tree level: </label><input class="nodeItem" type="number" id="nLevel" onchange="UpdateSelectedNode()"></input></div>
+		<div class="nodeSetting"><label>Tree level: </label><input class="nodeItem" type="number" id="nLevel" onchange="UpdateSelectedNode()" onkeyup="UpdateSelectedNode()"></input></div>
 	</div>
 
 	<div id="textbox">Load a script file or start adding nodes!</div>
@@ -33,40 +33,31 @@
 
 <script type="text/javascript" src="js/JSLoader.js"></script>
 <script type="text/javascript">
-	var _BOOTORDER = {
-		Ace: "js/ace/ace.js",
-		VisJS: "js/visjs/vis.min.js",
-		FileSaver: "js/FileSaver.min.js",
-		Globals: "js/March22/Globals.js",
-		HTML: "js/March22/HTML.js",
-		Functionality: "js/March22/Functionality.js",
-		M22Compiler: "js/March22/M22Compiler.js",
-		M22vis: "js/March22/M22vis.js",
-		Modal: "js/March22/Modal.js",
-		main: "main.js"
-	};
+	var _BOOTORDER = [
+		"js/ace/ace.js",
+		"js/visjs/vis.min.js",
+		"js/FileSaver.min.js",
+		"js/March22/Globals.js",
+		"js/March22/HTML.js",
+		"js/March22/Settings.js",
+		"js/March22/Functionality.js",
+		"js/March22/M22Compiler.js",
+		"js/March22/Node.js",
+		"js/March22/NodeTypes.js",
+		"js/March22/M22vis.js",
+		"js/March22/Modal.js",
+		"main.js"
+	];
+	var _BOOTCOUNTER = -1;
+	var LoadJS_R = function()
+	{
+		if(_BOOTCOUNTER < _BOOTORDER.length-1)
+			_BOOTCOUNTER++;
+		else return;
+		Loader.load(_BOOTORDER[_BOOTCOUNTER], LoadJS_R);
+	}
+	LoadJS_R();
 
-	Loader.load('js/ace/ace.js', function() {
-		Loader.load('js/visjs/vis.min.js', function() {
-			Loader.load('js/FileSaver.min.js', function() {
-				Loader.load('js/March22/Globals.js', function() {
-					Loader.load('js/March22/HTML.js', function() {
-						Loader.load('js/March22/Functionality.js', function() {
-							Loader.load('js/March22/M22Compiler.js', function() {
-								Loader.load('js/March22/M22vis.js', function() {
-									Loader.load('js/March22/Modal.js', function() {
-										Loader.load('main.js', function() {
-											console.log("Initializing main.js...");
-										});
-									});
-								});
-							});
-						});
-					});
-				});
-			});
-		});
-	});
 </script>
 <!-- <script type="text/javascript" src="main.js"></script> -->
     

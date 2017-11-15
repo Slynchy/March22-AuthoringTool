@@ -1,24 +1,9 @@
-
-
-// This is filled with functions where the parameters are the complete nodes and complete edges, for any modifications.
-// { func(), storedVariables[] }
-var queuedActions = [];
-
-function CompileNode(_scriptStr, _scriptStrPos, result)
+function Init()
 {
-    // this function compiles script lines until it reaches an IF statement or a checkpoint
-    // returns the new script str pos
-}
-
-function ToggleButtons(onOrOff)
-{
-	document.getElementById("fileItem").disabled = !onOrOff;
-	document.getElementById("fileItemSave").disabled = !onOrOff;
-	document.getElementById("compileButton").disabled = !onOrOff;
-	for (var index = 0; index < gl.nodeInfoBoxes.length; index++) {
-		var element = gl.nodeInfoBoxes[index];
-		if(element)
-			element.disabled = !onOrOff;
+	for (var k in Settings._optionParams) {
+		if (Settings._optionParams.hasOwnProperty(k)) {
+			Settings.options[k] = Settings._createOption(Settings._optionParams[k]);
+		}
 	}
 }
 
@@ -32,44 +17,46 @@ function HideFunctionNodes()
 		// iterate through ALL nodes, stash the function nodes and edges, remove them and re-draw
 		gl._STASHED_DATA = JSON.stringify(SaveNodesAndEdges())
 
+		var queuedEdgesForDeletion = [];
 		for (var key in gl.nodesDataset._data) {
 			if (gl.nodesDataset._data.hasOwnProperty(key)) {
 				var node = gl.nodesDataset._data[key];
-				if(node.nodeType !== Node.NodeTypes.narrative)
+				if(node.nodeType.name != Node.NodeTypes.narrative.name)
 				{
-					var edgesToNode = [];
-					var edgesFromNode = [];
-					for (var eKey in gl.edgesDataset._data) {
-						if (gl.edgesDataset._data.hasOwnProperty(eKey)) {
-							var edge = gl.edgesDataset._data[eKey];
-							if(edge.from === node.id)
-							{
-								edgesFromNode.push(edge);
-							}
-							else if( edge.to === node.id)
-							{
-								edgesToNode.push(edge);
-							}
-							else continue;
-						}
-					}
 
 					// We exclude these nodes because they are important :)
-					if(edgesFromNode.length != 1 || edgesToNode.length <= 0)
+					if(node.children.length != 1 || node.parents.length == 0 || node.parents.length > 1)
 					{
 						continue;
 					}
 
-					for (var i = 0; i < edgesToNode.length; i++) {
-						var edge = edgesToNode[i];
-						gl.edgesDataset._data[edge.id].to = edgesFromNode[0].to;
-					}
-
+					node = Node._LinkParentToChildren(node, queuedEdgesForDeletion);
+					
 					delete gl.nodesDataset._data[key];
-				} else continue;
-				delete gl.edgesDataset._data[edgesFromNode[0].id];
+				}
+				else 
+				{
+					continue;
+				}
 			}
 		}
+		
+		queuedEdgesForDeletion = queuedEdgesForDeletion.filter(function(elem, index, self) {
+			return index == self.indexOf(elem);
+		})
+
+		for (var i = 0; i < queuedEdgesForDeletion.length; i++) {
+			for (var k in gl.edgesDataset._data) {
+				if(k == queuedEdgesForDeletion[i])
+				{
+					delete gl.edgesDataset._data[k];
+					break;
+				}
+			}
+		}
+
+		Node.UpdateNodeChildren();
+		Node.CompressNodeLevels();
 
 		draw();
 	}
@@ -85,16 +72,21 @@ function HideFunctionNodes()
 		
 		gl._STASHED_DATA = JSON.parse(gl._STASHED_DATA);
 		// edit stashed data with edited nodes
-		for (var i = 0; i < gl._STASHED_DATA["nodes"].length; i++) {
+		for (var i = 0; i < gl._STASHED_DATA["nodes"].length; i++) 
+		{
 			var stashedNode = gl._STASHED_DATA["nodes"][i];
 
-			for (var nKey in gl.nodesDataset._data) {
-				if (gl.nodesDataset._data.hasOwnProperty(nKey)) {
+			for (var nKey in gl.nodesDataset._data) 
+			{
+				if (gl.nodesDataset._data.hasOwnProperty(nKey)) 
+				{
 					var realNode = gl.nodesDataset._data[nKey];
 					if(nKey === stashedNode.id)
 					{
-						SetNode(stashedNode,realNode);
-						//stashedNode.SCRIPT_TXT = realNode.SCRIPT_TXT;
+						// Hack fix: stops misaligned nodes after revealing
+						var cacheLevel = stashedNode.level;
+							Node.SetNode(stashedNode,realNode);
+						stashedNode.level = cacheLevel;
 						break;
 					}
 				}
@@ -105,15 +97,6 @@ function HideFunctionNodes()
 		LoadProject(gl._STASHED_DATA);
 
 		gl._STASHED_DATA = null;
-	}
-}
-
-function SetNode(node,props)
-{
-	for (var key in props) {
-		if (props.hasOwnProperty(key)) {
-			node[key] = props[key];
-		}
 	}
 }
 
@@ -143,6 +126,10 @@ function LoadProject(jsonStr)
 	var temp = JSON.parse(jsonStr);
 	gl.nodesDataset = new vis.DataSet(temp.nodes);
 	gl.edgesDataset = new vis.DataSet(temp.edges);
+
+	if(temp.settings)
+		Settings.options = temp.settings
+		
 	draw();
 }
 
@@ -171,6 +158,7 @@ function SaveNodesAndEdges()
 function SaveProject()
 {
 	var output = SaveNodesAndEdges();
+	output.settings = Settings.options;
 	var blob = new Blob([JSON.stringify(output)], {type: "text/plain;charset=utf-8"});
 	saveAs(blob, "test.m22proj");
 }
@@ -181,32 +169,16 @@ async function SaveScripts_Async()
 	var numOfFiles = 0;
 	var files = [];
 	var nodeIds = gl.nodesDataset.getIds();
+
+	var tempFile = {
+		name: "OUTPUT.txt",
+		nodes: []
+	};
+	files.push(tempFile);
+
 	for(i = 0; i < nodeIds.length; i++)
 	{
-		var fnameFound = -1;
-		for(f = 0; f < files.length; f++)
-		{
-			if(files[f].name === gl.nodesDataset._data[nodeIds[i]].title)
-			{
-				fnameFound = f;
-				break;
-			}
-		}
-		if(fnameFound === -1)
-		{
-			numOfFiles++;
-			
-			var tempFile = {
-				name: gl.nodesDataset._data[nodeIds[i]].title,
-				nodes: []
-			};
-			tempFile.nodes.push(gl.nodesDataset._data[nodeIds[i]]);
-			files.push(tempFile);
-		}
-		else
-		{
-			files[fnameFound].nodes.push(gl.nodesDataset._data[nodeIds[i]]);
-		}
+		files[0].nodes.push(gl.nodesDataset._data[nodeIds[i]]);
 	}
 	
 	for(i = 0; i < files.length; i++)
@@ -218,12 +190,18 @@ async function SaveScripts_Async()
 			}
 		);
 	}
-	
+
+	var result = "";
+	var firstNode = Node.GetFirstNode();
+	result += firstNode.startOfNode + "\n\n";
+	result += firstNode.SCRIPT_TXT + "\n\n";
+	result += "\n\n" + firstNode.endOfNode + "\n\n";
 	for(i = 0; i < files.length; i++)
 	{
-		var result = "";
 		for(n = 0; n < files[i].nodes.length; n++)
 		{ 
+			if(files[i].nodes[n].id == firstNode.id)
+				continue;
 			result += files[i].nodes[n].startOfNode + "\n\n";
 			result += files[i].nodes[n].SCRIPT_TXT + "\n\n";
 			result += "\n\n" + files[i].nodes[n].endOfNode + "\n\n";
@@ -241,14 +219,4 @@ function SaveScripts()
 	alert("Saving scripts, please be patient!");
 }
 
-
-
-
-
-
-
-
-
-
-
-
+Init();

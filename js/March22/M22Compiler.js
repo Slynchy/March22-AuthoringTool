@@ -127,7 +127,7 @@ M22Compiler.prototype.CompileLine = function(CURRENT_LINE_SPLIT, tempLine_c, res
             break;
         case this.LINETYPE.LOAD_SCRIPT:
             result.nodelinks.push({ from: hashedName + nodeInfo.currentNode, to: (CURRENT_LINE_SPLIT[1] + ".txt").hashCode() });
-			queuedActions.push(
+			gl.queuedActions.push(
 				{
 					func: function(completeNodes, completeEdges,storedVariables)
 					{
@@ -294,9 +294,9 @@ M22Compiler.prototype.ReadFileAsText = function(file)
 			);
 		}
 		
-		for (var n = 0; n < queuedActions.length; n++)
+		for (var n = 0; n < gl.queuedActions.length; n++)
 		{
-			queuedActions[n].func(nodes,edges,queuedActions[n].storedVariables);
+			gl.queuedActions[n].func(nodes,edges,gl.queuedActions[n].storedVariables);
 		}
 		
 		scriptFiles.push(temp);
